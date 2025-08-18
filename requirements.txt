@@ -1,11 +1,12 @@
 # Dependencias principales para la aplicación web
-Flask==2.3.3
+Flask==2.2.5
+Werkzeug==2.2.3
 Flask-WTF==1.1.1
 WTForms==3.0.1
 email-validator==2.2.0
 
 # Servidor WSGI para producción
-gunicorn==21.2.0
+gunicorn==20.1.0
 
 # Utilidades
 python-dateutil==2.8.2
