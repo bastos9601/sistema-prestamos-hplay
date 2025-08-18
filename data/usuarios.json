@@ -1,0 +1,93 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "nombre": "Administrador",
+    "email": "admin@sistema.com",
+    "rol": "admin",
+    "activo": true,
+    "fecha_registro": "2025-08-18T03:42:28.251468",
+    "ultimo_acceso": "2025-08-18T04:09:53.707997",
+    "permisos": [
+      "clientes.ver",
+      "clientes.crear",
+      "clientes.editar",
+      "clientes.eliminar",
+      "prestamos.ver",
+      "prestamos.crear",
+      "prestamos.editar",
+      "prestamos.eliminar",
+      "pagos.ver",
+      "pagos.crear",
+      "pagos.editar",
+      "pagos.eliminar",
+      "reportes.ver",
+      "usuarios.ver",
+      "usuarios.crear",
+      "usuarios.editar",
+      "usuarios.eliminar"
+    ]
+  },
+  {
+    "id": 2,
+    "username": "supervisor",
+    "password_hash": "4e4c56e4a15f89f05c2f4c72613da2a18c9665d4f0d6acce16415eb06f9be776",
+    "nombre": "Supervisor General",
+    "email": "supervisor@sistema.com",
+    "rol": "supervisor",
+    "activo": true,
+    "fecha_registro": "2025-08-18T04:04:32.436171",
+    "ultimo_acceso": null,
+    "permisos": [
+      "clientes.ver",
+      "clientes.crear",
+      "clientes.editar",
+      "prestamos.ver",
+      "prestamos.crear",
+      "prestamos.editar",
+      "pagos.ver",
+      "pagos.crear",
+      "pagos.editar",
+      "reportes.ver",
+      "usuarios.ver"
+    ]
+  },
+  {
+    "id": 3,
+    "username": "operador",
+    "password_hash": "13a93f9a5502e71eed80a806f87bc4424e03e6b0d90acd513ea9d561c853b738",
+    "nombre": "Operador del Sistema",
+    "email": "operador@sistema.com",
+    "rol": "operador",
+    "activo": true,
+    "fecha_registro": "2025-08-18T04:04:32.443168",
+    "ultimo_acceso": null,
+    "permisos": [
+      "clientes.ver",
+      "clientes.crear",
+      "prestamos.ver",
+      "prestamos.crear",
+      "pagos.ver",
+      "pagos.crear",
+      "reportes.ver"
+    ]
+  },
+  {
+    "id": 4,
+    "username": "consultor",
+    "password_hash": "7e31b85bb0182bf78c7ee2f6ed34e746292d8cff61320390cf685d59f878381a",
+    "nombre": "Consultor de Reportes",
+    "email": "consultor@sistema.com",
+    "rol": "consultor",
+    "activo": true,
+    "fecha_registro": "2025-08-18T04:04:32.450167",
+    "ultimo_acceso": "2025-08-18T04:09:03.959959",
+    "permisos": [
+      "clientes.ver",
+      "prestamos.ver",
+      "pagos.ver",
+      "reportes.ver"
+    ]
+  }
+]

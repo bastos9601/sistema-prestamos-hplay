@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "prestamo_id": 1,
+    "monto": 5.0,
+    "fecha": "2025-08-18T02:36:18.384793",
+    "concepto": "primer pago",
+    "fecha_registro": "2025-08-18T02:36:18.384793",
+    "saldo_despues": 0.0
+  },
+  {
+    "id": 2,
+    "prestamo_id": 1,
+    "monto": 5.0,
+    "fecha": "2025-08-18T03:00:28.050762",
+    "concepto": "Pago de cuota",
+    "fecha_registro": "2025-08-18T03:00:28.050762",
+    "saldo_despues": 0.0
+  },
+  {
+    "id": 3,
+    "prestamo_id": 1,
+    "monto": 5.0,
+    "fecha": "2025-08-18T03:13:10.802606",
+    "concepto": "Pago de cuota",
+    "fecha_registro": "2025-08-18T03:13:10.802606",
+    "saldo_despues": 0.0
+  },
+  {
+    "id": 4,
+    "prestamo_id": 1,
+    "monto": 5.0,
+    "fecha": "2025-08-18T03:32:16.089275",
+    "concepto": "Pago de cuota",
+    "fecha_registro": "2025-08-18T03:32:16.089275",
+    "saldo_despues": 105.05479452054794
+  }
+]

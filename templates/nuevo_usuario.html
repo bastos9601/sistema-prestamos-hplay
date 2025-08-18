@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Usuario{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Crear Nuevo Usuario
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">
+                                        <i class="fas fa-user me-2"></i>Nombre de Usuario *
+                                    </label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           required minlength="3" maxlength="50" 
+                                           placeholder="Ingrese nombre de usuario">
+                                    <div class="form-text">
+                                        Mínimo 3 caracteres, solo letras, números y guiones bajos
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">
+                                        <i class="fas fa-id-card me-2"></i>Nombre Completo *
+                                    </label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" 
+                                           required placeholder="Ingrese nombre completo">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">
+                                        <i class="fas fa-lock me-2"></i>Contraseña *
+                                    </label>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           required minlength="6" placeholder="Ingrese contraseña">
+                                    <div class="form-text">
+                                        Mínimo 6 caracteres
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           placeholder="usuario@ejemplo.com">
+                                    <div class="form-text">
+                                        Opcional
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="rol" class="form-label">
+                                <i class="fas fa-user-tag me-2"></i>Rol *
+                            </label>
+                            <select class="form-select" id="rol" name="rol" required>
+                                <option value="">Seleccione un rol</option>
+                                {% for rol in roles %}
+                                <option value="{{ rol }}">
+                                    {{ rol|title }} - 
+                                    {% if rol == 'admin' %}
+                                        Acceso completo al sistema
+                                    {% elif rol == 'supervisor' %}
+                                        Puede crear, editar y ver todo
+                                    {% elif rol == 'operador' %}
+                                        Puede crear y ver registros
+                                    {% elif rol == 'consultor' %}
+                                        Solo puede ver reportes
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                El rol determina los permisos del usuario en el sistema
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Crear Usuario
+                            </button>
+                            <a href="{{ url_for('usuarios') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver a Usuarios
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

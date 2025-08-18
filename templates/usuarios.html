@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-shield me-2"></i>Gestión de Usuarios</h2>
+        {% if 'usuarios.crear' in session.get('permisos', []) %}
+        <a href="{{ url_for('nuevo_usuario') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nuevo Usuario
+        </a>
+        {% endif %}
+    </div>
+
+    {% if usuarios %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Último Acceso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ usuario.id }}</td>
+                            <td>
+                                <strong>{{ usuario.username }}</strong>
+                                {% if usuario.id == session.get('user_id') %}
+                                <span class="badge bg-info">Tú</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ usuario.nombre }}</td>
+                            <td>{{ usuario.email or 'N/A' }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'danger' if usuario.rol == 'admin' else 'warning' if usuario.rol == 'supervisor' else 'info' if usuario.rol == 'operador' else 'secondary' }}">
+                                    {{ usuario.rol|title }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if usuario.activo %}
+                                <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if usuario.ultimo_acceso %}
+                                <small class="text-muted">
+                                    {{ usuario.ultimo_acceso.strftime('%d/%m/%Y %H:%M') }}
+                                </small>
+                                {% else %}
+                                <small class="text-muted">Nunca</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    {% if 'usuarios.editar' in session.get('permisos', []) %}
+                                    <a href="{{ url_for('editar_usuario', usuario_id=usuario.id) }}" 
+                                       class="btn btn-sm btn-outline-primary" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if 'usuarios.eliminar' in session.get('permisos', []) and usuario.id != session.get('user_id') %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="confirmarEliminacion({{ usuario.id }}, '{{ usuario.nombre }}')" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-2"></i>
+        No hay usuarios registrados en el sistema.
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar al usuario <strong id="nombreUsuario"></strong>?</p>
+                <p class="text-muted small">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    El usuario será marcado como inactivo y no podrá acceder al sistema.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(usuarioId, nombreUsuario) {
+    document.getElementById('nombreUsuario').textContent = nombreUsuario;
+    document.getElementById('formEliminar').action = `/usuarios/${usuarioId}/eliminar`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+    modal.show();
+}
+</script>
+{% endblock %}

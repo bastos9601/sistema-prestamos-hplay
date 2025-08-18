@@ -1,0 +1,403 @@
+{% extends "base.html" %}
+
+{% block title %}Préstamos - Sistema de Préstamos{% endblock %}
+
+{% block extra_css %}
+<style>
+.pagos-row {
+    background-color: #f8f9fa;
+}
+
+.pagos-row .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.pagos-row .table-sm th {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.pagos-row .table-sm td {
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-money-bill-wave me-2"></i>
+                Préstamos Activos
+            </h2>
+            <a href="{{ url_for('nuevo_prestamo') }}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i>Nuevo Préstamo
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Lista de Préstamos
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if prestamos %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="prestamosTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 30px;"></th>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Monto</th>
+                                <th>Tasa (%)</th>
+                                <th>Plazo</th>
+                                <th>Estado</th>
+                                <th>Progreso</th>
+                                <th>Saldo Pendiente</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in prestamos %}
+                            <tr>
+                                <td>
+                                    {% if item.prestamo.pagos %}
+                                        <button class="btn btn-sm btn-outline-primary" 
+                                                onclick="togglePagos({{ item.prestamo.id }})" 
+                                                title="Ver Pagos">
+                                            <i class="fas fa-chevron-down" id="icon-{{ item.prestamo.id }}"></i>
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-secondary">#{{ item.prestamo.id }}</span></td>
+                                <td>
+                                    <strong>{{ item.cliente.nombre }} {{ item.cliente.apellido }}</strong>
+                                    <br><small class="text-muted">{{ item.cliente.dni }}</small>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-success">
+                                        ${{ "%.2f"|format(item.prestamo.monto) }}
+                                    </span>
+                                </td>
+                                <td>{{ "%.2f"|format(item.prestamo.tasa_interes) }}%</td>
+                                <td>{{ item.prestamo.plazo_dias }} días</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if item.prestamo.estado == 'activo' else 'secondary' }}">
+                                        {{ 'Activo' if item.prestamo.estado == 'activo' else 'Finalizado' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if item.prestamo.tipo_interes == 'gota_a_gota' %}
+                                        {% set intereses_pagados = item.prestamo.calcular_intereses_pagados() %}
+                                        {% set intereses_total = item.prestamo.calcular_interes_total() %}
+                                        {% set progreso = (intereses_pagados / intereses_total * 100) if intereses_total > 0 else 0 %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ progreso }}%" 
+                                                 aria-valuenow="{{ progreso }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ "%.0f"|format(progreso) }}%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Intereses</small>
+                                    {% else %}
+                                        {% set monto_total = item.prestamo.calcular_monto_total() %}
+                                        {% set pagos_realizados = item.prestamo.calcular_intereses_pagados() %}
+                                        {% set progreso = (pagos_realizados / monto_total * 100) if monto_total > 0 else 0 %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                 style="width: {{ progreso }}%" 
+                                                 aria-valuenow="{{ progreso }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ "%.0f"|format(progreso) }}%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Total</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.prestamo.tipo_interes == 'gota_a_gota' %}
+                                        <div class="text-center">
+                                            <div class="fw-bold text-{{ 'success' if item.prestamo.calcular_capital_pendiente() <= 0 else 'warning' }}">
+                                                ${{ "%.2f"|format(item.prestamo.calcular_capital_pendiente()) }}
+                                            </div>
+                                            <small class="text-muted">Capital Pendiente</small>
+                                            <br>
+                                            <small class="text-info">
+                                                + ${{ "%.2f"|format(item.prestamo.calcular_intereses_pendientes()) }} intereses
+                                            </small>
+                                        </div>
+                                    {% else %}
+                                        <span class="fw-bold text-{{ 'success' if item.prestamo.calcular_saldo_pendiente() <= 0 else 'warning' }}">
+                                            ${{ "%.2f"|format(item.prestamo.calcular_saldo_pendiente()) }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ url_for('ver_prestamo', prestamo_id=item.prestamo.id) }}" 
+                                           class="btn btn-outline-info" title="Ver Detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('nuevo_pago') }}?prestamo_id={{ item.prestamo.id }}" 
+                                           class="btn btn-outline-success" title="Registrar Pago">
+                                            <i class="fas fa-credit-card"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-outline-danger" 
+                                                title="Eliminar Préstamo"
+                                                onclick="confirmarEliminacion({{ item.prestamo.id }}, '{{ item.cliente.nombre }} {{ item.cliente.apellido }}', {{ 'true' if item.prestamo.pagos else 'false' }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Fila expandible para mostrar pagos -->
+                            {% if item.prestamo.pagos %}
+                            <tr id="pagos-{{ item.prestamo.id }}" class="pagos-row" style="display: none;">
+                                <td colspan="10">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-history me-2"></i>
+                                                Historial de Pagos - Préstamo #{{ item.prestamo.id }}
+                                            </h6>
+                                            
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-borderless">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th>Fecha y Hora</th>
+                                                            <th>Monto Pagado</th>
+                                                            <th>Concepto</th>
+                                                            <th>Saldo Después</th>
+                                                            <th>Progreso</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for pago in item.prestamo.pagos %}
+                                                        <tr>
+                                                            <td>
+                                                                <small class="text-muted">
+                                                                    <i class="fas fa-calendar me-1"></i>
+                                                                    {{ pago.fecha.strftime('%d/%m/%Y') if pago.fecha else 'N/A' }}
+                                                                </small>
+                                                                <br>
+                                                                <small class="text-muted">
+                                                                    <i class="fas fa-clock me-1"></i>
+                                                                    {{ pago.fecha.strftime('%H:%M') if pago.fecha else 'N/A' }}
+                                                                </small>
+                                                            </td>
+                                                            <td>
+                                                                <span class="fw-bold text-success">
+                                                                    ${{ "%.2f"|format(pago.monto) }}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-muted">
+                                                                    {{ pago.concepto or 'Pago de cuota' }}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                {% if item.prestamo.tipo_interes == 'gota_a_gota' %}
+                                                                    <div class="text-center">
+                                                                        <div class="fw-bold text-{{ 'success' if pago.saldo_despues <= 0 else 'warning' }}">
+                                                                            ${{ "%.2f"|format(pago.saldo_despues) if pago.saldo_despues else 'N/A' }}
+                                                                        </div>
+                                                                        <small class="text-muted">Total Pendiente</small>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <span class="fw-bold text-{{ 'success' if pago.saldo_despues <= 0 else 'warning' }}">
+                                                                        ${{ "%.2f"|format(pago.saldo_despues) if pago.saldo_despues else 'N/A' }}
+                                                                    </span>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {% if item.prestamo.tipo_interes == 'gota_a_gota' %}
+                                                                    {% set intereses_pagados = item.prestamo.calcular_intereses_pagados() %}
+                                                                    {% set intereses_total = item.prestamo.calcular_interes_total() %}
+                                                                    {% set progreso = (intereses_pagados / intereses_total * 100) if intereses_total > 0 else 0 %}
+                                                                    <div class="progress" style="height: 15px;">
+                                                                        <div class="progress-bar bg-success" role="progressbar" 
+                                                                             style="width: {{ progreso }}%" 
+                                                                             aria-valuenow="{{ progreso }}" 
+                                                                             aria-valuemin="0" aria-valuemax="100">
+                                                                            {{ "%.0f"|format(progreso) }}%
+                                                                        </div>
+                                                                    </div>
+                                                                    <small class="text-muted">Intereses</small>
+                                                                {% else %}
+                                                                    {% set monto_total = item.prestamo.calcular_monto_total() %}
+                                                                    {% set pagos_realizados = item.prestamo.calcular_intereses_pagados() %}
+                                                                    {% set progreso = (pagos_realizados / monto_total * 100) if monto_total > 0 else 0 %}
+                                                                    <div class="progress" style="height: 15px;">
+                                                                        <div class="progress-bar bg-info" role="progressbar" 
+                                                                             style="width: {{ progreso }}%" 
+                                                                             aria-valuenow="{{ progreso }}" 
+                                                                             aria-valuemin="0" aria-valuemax="100">
+                                                                            {{ "%.0f"|format(progreso) }}%
+                                                                        </div>
+                                                                    </div>
+                                                                    <small class="text-muted">Total</small>
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            
+                                            <div class="mt-3 text-center">
+                                                <a href="{{ url_for('ver_prestamo', prestamo_id=item.prestamo.id) }}" 
+                                                   class="btn btn-sm btn-outline-info me-2">
+                                                    <i class="fas fa-eye me-1"></i>Ver Detalles Completos
+                                                </a>
+                                                <a href="{{ url_for('nuevo_pago') }}?prestamo_id={{ item.prestamo.id }}" 
+                                                   class="btn btn-sm btn-success">
+                                                    <i class="fas fa-plus me-1"></i>Registrar Nuevo Pago
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-money-bill-wave fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay préstamos activos</h5>
+                    <p class="text-muted">Comienza creando tu primer préstamo</p>
+                    <div class="mt-4">
+                        <a href="{{ url_for('nuevo_prestamo') }}" class="btn btn-success btn-lg me-3">
+                            <i class="fas fa-plus me-2"></i>Crear Primer Préstamo
+                        </a>
+                        <a href="{{ url_for('clientes') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-users me-2"></i>Ver Clientes
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalEliminarLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres eliminar el préstamo del cliente <strong id="nombreClienteEliminar"></strong>?</p>
+                
+                <div id="advertenciaPagos" class="alert alert-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>¡Advertencia!</strong> Este préstamo tiene pagos registrados. 
+                    Al eliminarlo, también se eliminarán todos los pagos asociados.
+                </div>
+                
+                <p class="text-danger">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Esta acción no se puede deshacer.</strong>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Eliminar Préstamo
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Función para actualizar tabla
+function refreshTable() {
+    location.reload();
+}
+
+// Función para expandir/contraer filas de pagos
+function togglePagos(prestamoId) {
+    const pagosRow = document.getElementById(`pagos-${prestamoId}`);
+    const icon = document.getElementById(`icon-${prestamoId}`);
+    
+    if (pagosRow.style.display === 'none') {
+        // Expandir
+        pagosRow.style.display = 'table-row';
+        icon.className = 'fas fa-chevron-up';
+        icon.parentElement.classList.remove('btn-outline-primary');
+        icon.parentElement.classList.add('btn-primary');
+    } else {
+        // Contraer
+        pagosRow.style.display = 'none';
+        icon.className = 'fas fa-chevron-down';
+        icon.parentElement.classList.remove('btn-primary');
+        icon.parentElement.classList.add('btn-outline-primary');
+    }
+}
+
+// Función para confirmar eliminación de préstamo
+function confirmarEliminacion(prestamoId, nombreCliente, tienePagos) {
+    // Configurar el modal
+    document.getElementById('nombreClienteEliminar').textContent = nombreCliente;
+    document.getElementById('formEliminar').action = `/prestamos/${prestamoId}/eliminar`;
+    
+    // Mostrar/ocultar advertencia de pagos
+    const advertenciaPagos = document.getElementById('advertenciaPagos');
+    if (tienePagos) {
+        advertenciaPagos.style.display = 'block';
+    } else {
+        advertenciaPagos.style.display = 'none';
+    }
+    
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+    modal.show();
+}
+
+// Inicializar tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Detalles del Préstamo - Sistema de Préstamos{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-money-bill-wave me-2"></i>
+                Detalles del Préstamo #{{ resumen.prestamo.id }}
+            </h2>
+            <div>
+                <a href="{{ url_for('nuevo_pago') }}?prestamo_id={{ resumen.prestamo.id }}" class="btn btn-success me-2">
+                    <i class="fas fa-credit-card me-1"></i>Registrar Pago
+                </a>
+                <a href="{{ url_for('prestamos') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- Información del Préstamo -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Información del Préstamo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>ID:</strong></td>
+                                <td><span class="badge bg-secondary">#{{ resumen.prestamo.id }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cliente:</strong></td>
+                                <td>{{ resumen.prestamo.cliente.nombre }} {{ resumen.prestamo.cliente.apellido }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DNI:</strong></td>
+                                <td>{{ resumen.prestamo.cliente.dni }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Teléfono:</strong></td>
+                                <td>{{ resumen.prestamo.cliente.telefono }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>{{ resumen.prestamo.cliente.email or 'No especificado' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-calculator me-2"></i>
+                            Detalles Financieros
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Monto:</strong></td>
+                                <td><span class="fw-bold text-success">${{ "%.2f"|format(resumen.prestamo.monto) }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tasa de Interés:</strong></td>
+                                <td>{{ "%.2f"|format(resumen.prestamo.tasa_interes) }}% anual</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Plazo:</strong></td>
+                                <td>{{ resumen.prestamo.plazo_dias }} días</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tipo de Interés:</strong></td>
+                                <td>{{ resumen.prestamo.tipo_interes.title() }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Estado:</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if resumen.prestamo.estado == 'activo' else 'secondary' }}">
+                                        {{ 'Activo' if resumen.prestamo.estado == 'activo' else 'Finalizado' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% if resumen.prestamo.tipo_interes == 'gota_a_gota' %}
+                            <tr>
+                                <td><strong>Capital Pendiente:</strong></td>
+                                <td><span class="fw-bold text-primary">${{ "%.2f"|format(resumen.prestamo.monto) }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Intereses Pagados:</strong></td>
+                                <td><span class="fw-bold text-success">${{ "%.2f"|format(resumen.prestamo.calcular_intereses_pagados()) }}</span></td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen Financiero -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Resumen Financiero
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
+                            <h4 class="text-success">${{ "%.2f"|format(resumen.monto_original) }}</h4>
+                            <p class="text-muted mb-0">Monto Original</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="fas fa-credit-card fa-2x text-info mb-2"></i>
+                            <h4 class="text-info">${{ "%.2f"|format(resumen.prestamo.calcular_intereses_pagados()) }}</h4>
+                            <p class="text-muted mb-0">
+                                {% if resumen.prestamo.tipo_interes == 'gota_a_gota' %}
+                                    Intereses Pagados
+                                {% else %}
+                                    Total Pagado
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="fas fa-percentage fa-2x text-warning mb-2"></i>
+                            <h4 class="text-warning">${{ "%.2f"|format(resumen.total_intereses) }}</h4>
+                            <p class="text-muted mb-0">Total Intereses</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="fas fa-balance-scale fa-2x text-danger mb-2"></i>
+                            <h4 class="text-danger">${{ "%.2f"|format(resumen.saldo_pendiente) }}</h4>
+                            <p class="text-muted mb-0">Saldo Pendiente</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de Cuotas -->
+        {% if resumen.prestamo.tipo_interes == 'gota_a_gota' %}
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-calculator me-2"></i>
+                    Información de Cuotas - Gota a Gota
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="fas fa-calendar-day fa-2x text-warning mb-2"></i>
+                            <h4 class="text-warning">${{ "%.2f"|format(resumen.prestamo.calcular_cuota_diaria()) }}</h4>
+                            <p class="text-muted mb-0">Cuota Diaria (Intereses)</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="fas fa-dollar-sign fa-2x text-primary mb-2"></i>
+                            <h4 class="text-primary">${{ "%.2f"|format(resumen.prestamo.monto) }}</h4>
+                            <p class="text-muted mb-0">Capital al Final</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                            <h4 class="text-info">{{ resumen.prestamo.plazo_dias - resumen.prestamo.pagos|length }}</h4>
+                            <p class="text-muted mb-0">Días Restantes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="border rounded p-3">
+                            <i class="fas fa-percentage fa-2x text-success mb-2"></i>
+                            {% set intereses_pagados = resumen.prestamo.calcular_intereses_pagados() %}
+                            {% set intereses_total = resumen.prestamo.calcular_interes_total() %}
+                            {% set progreso = (intereses_pagados / intereses_total * 100) if intereses_total > 0 else 0 %}
+                            <h4 class="text-success">{{ "%.1f"|format(progreso) }}%</h4>
+                            <p class="text-muted mb-0">Intereses Pagados</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Barra de Progreso de Intereses -->
+                <div class="mt-3">
+                    <label class="form-label">Progreso de Intereses:</label>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ progreso }}%" 
+                             aria-valuenow="{{ progreso }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            {{ "%.1f"|format(progreso) }}% Completado
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Historial de Pagos -->
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Historial de Pagos
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if resumen.pagos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Concepto</th>
+                                <th>Saldo Pendiente</th>
+                                <th>Progreso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pago in resumen.pagos %}
+                            <tr>
+                                <td><span class="badge bg-secondary">#{{ pago.id }}</span></td>
+                                <td>
+                                    <span class="text-muted">
+                                        {{ pago.fecha.strftime('%d/%m/%Y') if pago.fecha else 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-success">
+                                        ${{ "%.2f"|format(pago.monto) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">
+                                        {{ pago.concepto or 'Pago de cuota' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-{{ 'success' if pago.saldo_despues <= 0 else 'warning' }}">
+                                        ${{ "%.2f"|format(pago.saldo_despues) if pago.saldo_despues else 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if resumen.prestamo.tipo_interes == 'gota_a_gota' %}
+                                        {% set intereses_pagados = resumen.prestamo.calcular_intereses_pagados() %}
+                                        {% set intereses_total = resumen.prestamo.calcular_interes_total() %}
+                                        {% set progreso_intereses = (intereses_pagados / intereses_total * 100) if intereses_total > 0 else 0 %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ progreso_intereses }}%" 
+                                                 aria-valuenow="{{ progreso_intereses }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ "%.1f"|format(progreso_intereses) }}%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Intereses: {{ "%.1f"|format(progreso_intereses) }}%</small>
+                                    {% else %}
+                                        {% set monto_total = resumen.prestamo.calcular_monto_total() %}
+                                        {% set pagos_realizados = resumen.prestamo.calcular_intereses_pagados() %}
+                                        {% set progreso_total = (pagos_realizados / monto_total * 100) if monto_total > 0 else 0 %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                 style="width: {{ progreso_total }}%" 
+                                                 aria-valuenow="{{ progreso_total }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ "%.1f"|format(progreso_total) }}%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Total: {{ "%.1f"|format(progreso_total) }}%</small>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay pagos registrados</h5>
+                    <p class="text-muted">Este préstamo aún no tiene pagos registrados</p>
+                    <a href="{{ url_for('nuevo_pago') }}?prestamo_id={{ resumen.prestamo.id }}" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i>Registrar Primer Pago
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Inicializar tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

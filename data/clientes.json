@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "nombre": "alfredo",
+    "apellido": "bastos",
+    "dni": "769857",
+    "telefono": "96326489",
+    "email": "prometieron66@gmail.com",
+    "fecha_registro": "2025-08-18T02:33:44.558564",
+    "activo": true
+  }
+]

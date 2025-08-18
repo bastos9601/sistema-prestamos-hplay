@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Préstamo - Sistema de Préstamos{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-plus me-2"></i>
+                    Nuevo Préstamo
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.cliente_id.id }}" class="form-label">
+                            <i class="fas fa-user me-1"></i>Cliente *
+                        </label>
+                        {{ form.cliente_id(class="form-select", **{"data-cliente": ""}) }}
+                        {% if form.cliente_id.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.cliente_id.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.monto.id }}" class="form-label">
+                                <i class="fas fa-dollar-sign me-1"></i>Monto del Préstamo *
+                            </label>
+                            {{ form.monto(class="form-control", placeholder="0.00", step="0.01", min="0.01") }}
+                            {% if form.monto.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.monto.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.tasa_interes.id }}" class="form-label">
+                                <i class="fas fa-percentage me-1"></i>Tasa de Interés Anual (%) *
+                            </label>
+                            {{ form.tasa_interes(class="form-control", placeholder="0.00", step="0.01", min="0.01") }}
+                            {% if form.tasa_interes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.tasa_interes.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.plazo_dias.id }}" class="form-label">
+                                <i class="fas fa-calendar me-1"></i>Plazo en Días *
+                            </label>
+                            {{ form.plazo_dias(class="form-control", placeholder="30", min="1", max="3650") }}
+                            {% if form.plazo_dias.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.plazo_dias.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.tipo_interes.id }}" class="form-label">
+                                <i class="fas fa-calculator me-1"></i>Tipo de Interés *
+                            </label>
+                            {{ form.tipo_interes(class="form-select") }}
+                            {% if form.tipo_interes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.tipo_interes.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Información del cliente seleccionado -->
+                    <div id="clienteInfo" class="alert alert-info" style="display: none;">
+                        <h6><i class="fas fa-info-circle me-1"></i>Información del Cliente</h6>
+                        <div id="clienteDetails"></div>
+                    </div>
+                    
+                    <!-- Cálculo previo -->
+                    <div id="calculoPrevio" class="alert alert-warning" style="display: none;">
+                        <h6><i class="fas fa-calculator me-1"></i>Cálculo Previo</h6>
+                        <div id="calculoDetails"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('prestamos') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Volver
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-1"></i>Crear Préstamo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const clienteSelect = document.getElementById('{{ form.cliente_id.id }}');
+    const montoInput = document.getElementById('{{ form.monto.id }}');
+    const tasaInput = document.getElementById('{{ form.tasa_interes.id }}');
+    const plazoInput = document.getElementById('{{ form.plazo_dias.id }}');
+    const clienteInfo = document.getElementById('clienteInfo');
+    const clienteDetails = document.getElementById('clienteDetails');
+    const calculoPrevio = document.getElementById('calculoPrevio');
+    const calculoDetails = document.getElementById('calculoDetails');
+    
+    // Mostrar información del cliente seleccionado
+    clienteSelect.addEventListener('change', function() {
+        if (this.value) {
+            // Obtener la información del cliente desde la base de datos
+            const clienteId = this.value;
+            const selectedOption = this.options[this.selectedIndex];
+            const clienteText = selectedOption.text;
+            
+            // Extraer información del texto del option
+            const match = clienteText.match(/(.+) - DNI: (.+)/);
+            if (match) {
+                const nombre = match[1];
+                const dni = match[2];
+                
+                clienteDetails.innerHTML = `
+                    <strong>Nombre:</strong> ${nombre}<br>
+                    <strong>DNI:</strong> ${dni}<br>
+                    <strong>Cliente ID:</strong> ${clienteId}
+                `;
+                clienteInfo.style.display = 'block';
+            }
+        } else {
+            clienteInfo.style.display = 'none';
+        }
+        calcularPrevio();
+    });
+    
+    // Calcular préstamo previo
+    function calcularPrevio() {
+        const monto = parseFloat(montoInput.value) || 0;
+        const tasa = parseFloat(tasaInput.value) || 0;
+        const plazo = parseInt(plazoInput.value) || 0;
+        const tipoInteres = document.getElementById('{{ form.tipo_interes.id }}').value;
+        
+        if (monto > 0 && tasa > 0 && plazo > 0) {
+            const tasaDiaria = tasa / 365 / 100;
+            let cuotaDiaria, totalInteres, totalPagar, descripcion;
+            
+            if (tipoInteres === 'gota_a_gota') {
+                // Sistema Gota a Gota
+                cuotaDiaria = monto * tasaDiaria; // Solo intereses diarios
+                totalInteres = cuotaDiaria * plazo;
+                totalPagar = monto + totalInteres; // Capital + intereses
+                
+                // Calcular cuota total diaria (capital + intereses divididos en días)
+                const cuotaTotalDiaria = totalPagar / plazo;
+                
+                descripcion = `
+                    <strong>Cuota Diaria (Solo Intereses):</strong> $${cuotaDiaria.toFixed(2)}<br>
+                    <strong>Cuota Total Diaria (Capital + Intereses):</strong> $${cuotaTotalDiaria.toFixed(2)}<br>
+                    <strong>Capital a Pagar al Final:</strong> $${monto.toFixed(2)}<br>
+                    <strong>Total de Intereses:</strong> $${totalInteres.toFixed(2)}<br>
+                    <strong>Total a Pagar:</strong> $${totalPagar.toFixed(2)}<br>
+                    <small class="text-info">💡 En Gota a Gota pagas intereses diarios y el capital al final</small><br>
+                    <small class="text-warning">⚠️ Si quisieras pagar TODO diariamente, sería $${cuotaTotalDiaria.toFixed(2)} por día</small>
+                `;
+            } else if (tipoInteres === 'simple') {
+                // Interés Simple
+                totalInteres = monto * tasaDiaria * plazo;
+                totalPagar = monto + totalInteres;
+                cuotaDiaria = totalPagar / plazo;
+                descripcion = `
+                    <strong>Cuota Diaria:</strong> $${cuotaDiaria.toFixed(2)}<br>
+                    <strong>Total de Intereses:</strong> $${totalInteres.toFixed(2)}<br>
+                    <strong>Total a Pagar:</strong> $${totalPagar.toFixed(2)}<br>
+                    <small class="text-info">💡 En Simple pagas capital + intereses divididos en días</small>
+                `;
+            } else {
+                // Interés Compuesto
+                const cuotaDiariaComp = monto * (tasaDiaria * Math.pow(1 + tasaDiaria, plazo)) / (Math.pow(1 + tasaDiaria, plazo) - 1);
+                totalInteres = (cuotaDiariaComp * plazo) - monto;
+                totalPagar = cuotaDiariaComp * plazo;
+                cuotaDiaria = cuotaDiariaComp;
+                descripcion = `
+                    <strong>Cuota Diaria:</strong> $${cuotaDiaria.toFixed(2)}<br>
+                    <strong>Total de Intereses:</strong> $${totalInteres.toFixed(2)}<br>
+                    <strong>Total a Pagar:</strong> $${totalPagar.toFixed(2)}<br>
+                    <small class="text-info">💡 En Compuesto los intereses crecen exponencialmente</small>
+                `;
+            }
+            
+            calculoDetails.innerHTML = descripcion;
+            calculoPrevio.style.display = 'block';
+        } else {
+            calculoPrevio.style.display = 'none';
+        }
+    }
+    
+    // Eventos para recalcular
+    [montoInput, tasaInput, plazoInput].forEach(input => {
+        input.addEventListener('input', calcularPrevio);
+    });
+    
+    // Recalcular al cambiar tipo de interés
+    document.getElementById('{{ form.tipo_interes.id }}').addEventListener('change', calcularPrevio);
+    
+    // Validación en tiempo real
+    montoInput.addEventListener('input', function() {
+        if (this.value <= 0) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    tasaInput.addEventListener('input', function() {
+        if (this.value <= 0) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    plazoInput.addEventListener('input', function() {
+        if (this.value < 1) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+});
+</script>
+{% endblock %}

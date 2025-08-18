@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Pagos - Sistema de Préstamos{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-credit-card me-2"></i>
+                Historial de Pagos
+            </h2>
+            <a href="{{ url_for('nuevo_pago') }}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i>Nuevo Pago
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Lista de Pagos
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if pagos %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="pagosTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Préstamo</th>
+                                <th>Cliente</th>
+                                <th>Monto</th>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Saldo Después</th>
+                                <th>Progreso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pago in pagos %}
+                            <tr>
+                                <td><span class="badge bg-secondary">#{{ pago.pago.id }}</span></td>
+                                <td>
+                                    <strong>Préstamo #{{ pago.prestamo.id }}</strong>
+                                    <br><small class="text-muted">${{ "%.2f"|format(pago.prestamo.monto) }}</small>
+                                </td>
+                                <td>
+                                    <strong>{{ pago.cliente.nombre }} {{ pago.cliente.apellido }}</strong>
+                                    <br><small class="text-muted">{{ pago.cliente.dni }}</small>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-success">
+                                        ${{ "%.2f"|format(pago.pago.monto) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">
+                                        {{ pago.pago.fecha.strftime('%d/%m/%Y') if pago.pago.fecha else 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">
+                                        {{ pago.pago.concepto or 'Pago de cuota' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-{{ 'success' if pago.pago.saldo_despues <= 0 else 'warning' }}">
+                                        ${{ "%.2f"|format(pago.pago.saldo_despues) if pago.pago.saldo_despues is not none else 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if pago.prestamo.tipo_interes == 'gota_a_gota' %}
+                                        {% set intereses_pagados = pago.prestamo.calcular_intereses_pagados() %}
+                                        {% set intereses_total = pago.prestamo.calcular_interes_total() %}
+                                        {% set progreso = (intereses_pagados / intereses_total * 100) if intereses_total > 0 else 0 %}
+                                        <div class="progress" style="height: 18px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ progreso }}%" 
+                                                 aria-valuenow="{{ progreso }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ "%.0f"|format(progreso) }}%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Intereses</small>
+                                    {% else %}
+                                        {% set monto_total = pago.prestamo.calcular_monto_total() %}
+                                        {% set pagos_realizados = pago.prestamo.calcular_intereses_pagados() %}
+                                        {% set progreso = (pagos_realizados / monto_total * 100) if monto_total > 0 else 0 %}
+                                        <div class="progress" style="height: 18px;">
+                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                 style="width: {{ progreso }}%" 
+                                                 aria-valuenow="{{ progreso }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ "%.0f"|format(progreso) }}%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Total</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" 
+                                                class="btn btn-outline-danger" 
+                                                title="Eliminar Pago"
+                                                onclick="confirmarEliminacionPago({{ pago.pago.id }}, '{{ pago.cliente.nombre }} {{ pago.cliente.apellido }}', {{ "%.2f"|format(pago.pago.monto) }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay pagos registrados</h5>
+                    <p class="text-muted">Comienza registrando tu primer pago</p>
+                    <div class="mt-4">
+                        <a href="{{ url_for('nuevo_pago') }}" class="btn btn-info btn-lg me-3">
+                            <i class="fas fa-plus me-2"></i>Registrar Primer Pago
+                        </a>
+                        <a href="{{ url_for('prestamos') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-money-bill-wave me-2"></i>Ver Préstamos
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación de Pago -->
+<div class="modal fade" id="modalEliminarPago" tabindex="-1" aria-labelledby="modalEliminarPagoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalEliminarPagoLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación de Pago
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres eliminar el pago de <strong id="nombreClientePagoEliminar"></strong> por <strong id="montoPagoEliminar"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>¡Advertencia!</strong> Esta acción eliminará el pago de la base de datos.
+                </div>
+                <p class="text-danger">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Esta acción no se puede deshacer.</strong>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <form id="formEliminarPago" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Eliminar Pago
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Función para actualizar tabla
+function refreshTable() {
+    location.reload();
+}
+
+// Función para confirmar eliminación de pago
+function confirmarEliminacionPago(pagoId, nombreCliente, monto) {
+    // Configurar el modal
+    document.getElementById('nombreClientePagoEliminar').textContent = nombreCliente;
+    document.getElementById('montoPagoEliminar').textContent = '$' + monto;
+    document.getElementById('formEliminarPago').action = `/pagos/${pagoId}/eliminar`;
+    
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminarPago'));
+    modal.show();
+}
+
+// Inicializar tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

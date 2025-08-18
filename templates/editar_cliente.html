@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Cliente - Sistema de Préstamos{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Editar Cliente
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nombre.id }}" class="form-label">
+                                <i class="fas fa-user me-1"></i>Nombre *
+                            </label>
+                            {{ form.nombre(class="form-control", placeholder="Ingrese el nombre") }}
+                            {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.nombre.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.apellido.id }}" class="form-label">
+                                <i class="fas fa-user me-1"></i>Apellido *
+                            </label>
+                            {{ form.apellido(class="form-control", placeholder="Ingrese el apellido") }}
+                            {% if form.apellido.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.apellido.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.dni.id }}" class="form-label">
+                                <i class="fas fa-id-card me-1"></i>DNI *
+                            </label>
+                            {{ form.dni(class="form-control", placeholder="Ingrese el DNI", readonly=true) }}
+                            <div class="form-text">El DNI no se puede modificar</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telefono.id }}" class="form-label">
+                                <i class="fas fa-phone me-1"></i>Teléfono *
+                            </label>
+                            {{ form.telefono(class="form-control", placeholder="Ingrese el teléfono") }}
+                            {% if form.telefono.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.telefono.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.email.id }}" class="form-label">
+                            <i class="fas fa-envelope me-1"></i>Email (opcional)
+                        </label>
+                        {{ form.email(class="form-control", placeholder="Ingrese el email") }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">El email es opcional pero recomendado para notificaciones.</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('clientes') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Actualizar Cliente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación en tiempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const nombreInput = document.getElementById('{{ form.nombre.id }}');
+    const apellidoInput = document.getElementById('{{ form.apellido.id }}');
+    const telefonoInput = document.getElementById('{{ form.telefono.id }}');
+    const emailInput = document.getElementById('{{ form.email.id }}');
+    
+    // Validar nombre
+    nombreInput.addEventListener('input', function() {
+        if (this.value.trim().length < 2) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    // Validar apellido
+    apellidoInput.addEventListener('input', function() {
+        if (this.value.trim().length < 2) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    // Validar teléfono
+    telefonoInput.addEventListener('input', function() {
+        if (this.value.trim().length < 7) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    // Validar email (opcional)
+    emailInput.addEventListener('input', function() {
+        if (this.value.trim() === '') {
+            this.classList.remove('is-invalid', 'is-valid');
+        } else if (this.value.includes('@') && this.value.includes('.')) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        } else {
+            this.classList.remove('is-valid');
+            this.classList.add('is-invalid');
+        }
+    });
+});
+</script>
+{% endblock %}

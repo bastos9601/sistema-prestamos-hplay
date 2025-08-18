@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - Sistema de Préstamos{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-chart-bar me-2"></i>
+            Reportes del Sistema
+        </h2>
+
+        <!-- Reporte General -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Reporte General
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row" id="reporteGeneral">
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                            <h4 class="text-primary" id="totalClientes">-</h4>
+                            <p class="text-muted">Total Clientes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-money-bill-wave fa-2x text-success mb-2"></i>
+                            <h4 class="text-success" id="totalPrestamos">-</h4>
+                            <p class="text-muted">Préstamos Activos</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-credit-card fa-2x text-info mb-2"></i>
+                            <h4 class="text-info" id="totalPagos">-</h4>
+                            <p class="text-muted">Total Pagos</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-dollar-sign fa-2x text-warning mb-2"></i>
+                            <h4 class="text-warning" id="montoTotal">-</h4>
+                            <p class="text-muted">Monto Total</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-outline-primary" onclick="actualizarReporteGeneral()">
+                        <i class="fas fa-sync-alt me-1"></i>Actualizar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reporte de Préstamos Activos -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Préstamos Activos
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="prestamosActivos">
+                    <div class="text-center py-3">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                        <p class="text-muted mt-2">Cargando préstamos...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado del Sistema -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Estado del Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="estadoSistema">
+                    <div class="text-center py-3">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                        <p class="text-muted mt-2">Verificando estado...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Búsqueda de Clientes -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-search me-2"></i>
+                    Búsqueda de Clientes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="busquedaCliente" 
+                                   placeholder="Buscar por nombre, apellido o DNI...">
+                            <button class="btn btn-primary" type="button" onclick="buscarCliente()">
+                                <i class="fas fa-search me-1"></i>Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="resultadosBusqueda" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Cargar reporte general al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarReporteGeneral();
+    cargarPrestamosActivos();
+    verificarEstadoSistema();
+});
+
+// Función para actualizar reporte general
+function actualizarReporteGeneral() {
+    fetch('/api/reporte-general')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error:', data.error);
+                return;
+            }
+            
+            document.getElementById('totalClientes').textContent = data.total_clientes || 0;
+            document.getElementById('totalPrestamos').textContent = data.prestamos_activos || 0;
+            document.getElementById('totalPagos').textContent = data.total_pagos || 0;
+            document.getElementById('montoTotal').textContent = '$' + (data.monto_total_prestado || 0).toFixed(2);
+        })
+        .catch(error => {
+            console.error('Error al cargar reporte general:', error);
+        });
+}
+
+// Función para verificar el estado del sistema
+function verificarEstadoSistema() {
+    fetch('/api/reporte-general')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error:', data.error);
+                return;
+            }
+            
+            const container = document.getElementById('estadoSistema');
+            const totalClientes = data.total_clientes || 0;
+            const totalPrestamos = data.prestamos_activos || 0;
+            
+            if (totalClientes === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <h6>El sistema está vacío</h6>
+                        <p class="mb-2">No hay clientes ni préstamos registrados.</p>
+                        <a href="/clientes/nuevo" class="btn btn-success">
+                            <i class="fas fa-user-plus me-1"></i>Crear Primer Cliente
+                        </a>
+                    </div>
+                `;
+            } else if (totalPrestamos === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <h6>No hay préstamos activos</h6>
+                        <p class="mb-2">Ya tienes ${totalClientes} cliente(s), pero no hay préstamos.</p>
+                        <a href="/prestamos/nuevo" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Crear Primer Préstamo
+                        </a>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="alert alert-success text-center">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <h6>Sistema funcionando correctamente</h6>
+                        <p class="mb-0">Tienes ${totalClientes} cliente(s) y ${totalPrestamos} préstamo(s) activo(s).</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error al verificar estado:', error);
+        });
+}
+
+// Función para cargar préstamos activos
+function cargarPrestamosActivos() {
+    fetch('/api/prestamos-activos')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error:', data.error);
+                return;
+            }
+            
+            const container = document.getElementById('prestamosActivos');
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-3">
+                        <i class="fas fa-info-circle fa-2x text-muted"></i>
+                        <p class="text-muted mt-2">No hay préstamos activos</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="table-responsive"><table class="table table-hover">';
+            html += '<thead class="table-light"><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Plazo</th></tr></thead>';
+            html += '<tbody>';
+            
+            data.forEach(prestamo => {
+                html += `
+                    <tr>
+                        <td><span class="badge bg-secondary">#${prestamo.id_prestamo}</span></td>
+                        <td>${prestamo.cliente}</td>
+                        <td><span class="fw-bold text-success">$${prestamo.monto_original.toFixed(2)}</span></td>
+                        <td>${prestamo.tasa_interes}%</td>
+                        <td>${prestamo.plazo_dias} días</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error al cargar préstamos:', error);
+        });
+}
+
+// Función para buscar clientes
+function buscarCliente() {
+    const termino = document.getElementById('busquedaCliente').value.trim();
+    if (termino.length < 2) {
+        alert('Ingresa al menos 2 caracteres para buscar');
+        return;
+    }
+    
+    fetch(`/api/buscar-cliente?q=${encodeURIComponent(termino)}`)
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('resultadosBusqueda');
+            
+            if (data.error) {
+                container.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+                return;
+            }
+            
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No se encontraron clientes con "${termino}"
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="table-responsive"><table class="table table-sm">';
+            html += '<thead class="table-light"><tr><th>ID</th><th>Nombre</th><th>DNI</th><th>Teléfono</th></tr></thead>';
+            html += '<tbody>';
+            
+            data.forEach(cliente => {
+                html += `
+                    <tr>
+                        <td><span class="badge bg-secondary">#${cliente.id}</span></td>
+                        <td><strong>${cliente.nombre} ${cliente.apellido}</strong></td>
+                        <td>${cliente.dni}</td>
+                        <td>${cliente.telefono}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error en búsqueda:', error);
+            document.getElementById('resultadosBusqueda').innerHTML = 
+                '<div class="alert alert-danger">Error al realizar la búsqueda</div>';
+        });
+}
+
+// Búsqueda al presionar Enter
+document.getElementById('busquedaCliente').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        buscarCliente();
+    }
+});
+</script>
+{% endblock %}
