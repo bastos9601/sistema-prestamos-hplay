@@ -1,0 +1,39 @@
+# CONFIGURACIÓN DE EMAIL PARA ENVÍO DE PAGARÉS
+# ================================================
+
+# Para que el sistema envíe emails reales, necesitas configurar Gmail SMTP:
+
+# 1. ACTIVAR VERIFICACIÓN EN 2 PASOS:
+#    - Ve a https://myaccount.google.com/security
+#    - Activa "Verificación en 2 pasos"
+
+# 2. GENERAR CONTRASEÑA DE APLICACIÓN:
+#    - Ve a https://myaccount.google.com/apppasswords
+#    - Selecciona "Correo" y "Windows"
+#    - Copia la contraseña generada (16 caracteres)
+
+# 3. CREAR ARCHIVO .env EN LA RAIZ DEL PROYECTO:
+#    - Crea un archivo llamado ".env" (sin extensión)
+#    - Agrega estas líneas:
+
+GMAIL_USER=tu_email@gmail.com
+GMAIL_APP_PASSWORD=tu_contraseña_de_aplicacion
+
+# 4. EJEMPLO REAL:
+# GMAIL_USER=prestamos@gmail.com
+# GMAIL_APP_PASSWORD=abcd efgh ijkl mnop
+
+# 5. REINICIAR LA APLICACIÓN:
+#    - Después de crear el archivo .env
+#    - Reinicia la aplicación Python
+
+# NOTAS IMPORTANTES:
+# - NO uses tu contraseña normal de Gmail
+# - La contraseña de aplicación es de 16 caracteres
+# - El archivo .env debe estar en la raíz del proyecto
+# - No subas el archivo .env a Git (está en .gitignore)
+
+# PROBLEMAS COMUNES:
+# - "Error de autenticación": Verifica la contraseña de aplicación
+# - "Usuario no encontrado": Verifica el email de Gmail
+# - "Acceso denegado": Activa verificación en 2 pasos primero

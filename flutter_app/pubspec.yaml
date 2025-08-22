@@ -1,0 +1,162 @@
+name: sistema_prestamos
+description: Sistema de Préstamos - Aplicación Móvil Multiplataforma
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI y Componentes
+  cupertino_icons: ^1.0.6
+  material_design_icons_flutter: ^7.0.7296
+  
+  # Estado y Gestión
+  provider: ^6.1.1
+  flutter_bloc: ^8.1.3
+  
+  # HTTP y API
+  dio: ^5.3.2
+  http: ^1.1.0
+  
+  # Base de Datos Local
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  
+  # Almacenamiento Local
+  shared_preferences: ^2.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Autenticación y Seguridad
+  local_auth: ^2.1.6
+  crypto: ^3.0.3
+  
+  # Navegación
+  go_router: ^12.1.3
+  
+  # Formularios
+  form_builder_validators: ^9.1.0
+  
+  # Gráficos y Visualización
+  fl_chart: ^0.65.0
+  syncfusion_flutter_charts: ^23.1.44
+  
+  # PDF y Documentos
+  pdf: ^3.10.4
+  printing: ^5.11.1
+  
+  # Imágenes y Multimedia
+  image_picker: ^1.0.4
+  cached_network_image: ^3.3.0
+  
+  # Notificaciones
+  flutter_local_notifications: ^16.1.0
+  
+  # Geolocalización
+  geolocator: ^10.1.0
+  
+  # Permisos
+  permission_handler: ^11.0.1
+  
+  # Utilitarios
+  intl: ^0.18.1
+  url_launcher: ^6.2.1
+  package_info_plus: ^4.1.0
+  device_info_plus: ^9.1.1
+  
+  # QR y Barcode
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^3.5.5
+  
+  # Biometría
+  local_auth_android: ^1.0.35
+  local_auth_ios: ^1.1.4
+  
+  # Encriptación
+  encrypt: ^5.0.3
+  
+  # Validación
+  validators: ^3.0.0
+  
+  # Internacionalización
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # Análisis de código
+  flutter_lints: ^3.0.0
+  custom_lint: ^0.5.7
+  
+  # Testing
+  mockito: ^5.4.2
+  build_runner: ^2.4.7
+  
+  # Generación de código
+  hive_generator: ^2.0.1
+  json_annotation: ^4.8.1
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+  
+  # Fuentes personalizadas
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+  
+  # Imágenes y assets
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/logos/
+    - assets/documents/
+  
+  # Configuración específica por plataforma
+  platforms:
+    android:
+      package: com.prestamos.sistema
+      versionCode: 1
+      versionName: "1.0.0"
+    ios:
+      bundleId: com.prestamos.sistema
+      version: "1.0.0"
+      buildNumber: "1"
+    web:
+      baseHref: /
+    windows:
+      runner: windows/runner/
+    macos:
+      runner: macos/Runner/
+    linux:
+      runner: linux/runner/
+
+# Configuración de build
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+
+# Configuración de PWA
+flutter_web:
+  baseHref: /
+  title: "Sistema de Préstamos"
+  description: "Aplicación móvil del Sistema de Préstamos"
+  themeColor: "#667eea"
+  backgroundColor: "#ffffff"

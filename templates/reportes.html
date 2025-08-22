@@ -70,6 +70,9 @@
                     <div class="text-center py-3">
                         <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
                         <p class="text-muted mt-2">Cargando préstamos...</p>
+                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="cargarPrestamosActivos()">
+                            <i class="fas fa-redo me-1"></i>Reintentar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -202,15 +205,46 @@ function verificarEstadoSistema() {
 
 // Función para cargar préstamos activos
 function cargarPrestamosActivos() {
+    console.log('🔄 Iniciando carga de préstamos activos...');
+    
     fetch('/api/prestamos-activos')
-        .then(response => response.json())
+        .then(response => {
+            console.log('📡 Respuesta recibida:', response.status, response.statusText);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('📊 Datos recibidos:', data);
+            
             if (data.error) {
-                console.error('Error:', data.error);
+                console.error('❌ Error en datos:', data.error);
+                const container = document.getElementById('prestamosActivos');
+                container.innerHTML = `
+                    <div class="alert alert-danger text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <h6>Error al cargar préstamos</h6>
+                        <p class="mb-0">${data.error}</p>
+                    </div>
+                `;
                 return;
             }
             
             const container = document.getElementById('prestamosActivos');
+            
+            if (!Array.isArray(data)) {
+                console.error('❌ Los datos no son un array:', typeof data, data);
+                container.innerHTML = `
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <h6>Formato de datos incorrecto</h6>
+                        <p class="mb-0">Los datos recibidos no tienen el formato esperado.</p>
+                    </div>
+                `;
+                return;
+            }
+            
             if (data.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-3">
@@ -221,27 +255,53 @@ function cargarPrestamosActivos() {
                 return;
             }
             
+            console.log('✅ Procesando', data.length, 'préstamos...');
+            
             let html = '<div class="table-responsive"><table class="table table-hover">';
-            html += '<thead class="table-light"><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Plazo</th></tr></thead>';
+            html += '<thead class="table-light"><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Plazo</th><th>Usuario Creador</th></tr></thead>';
             html += '<tbody>';
             
-            data.forEach(prestamo => {
+            data.forEach((prestamo, index) => {
+                console.log(`📋 Procesando préstamo ${index + 1}:`, prestamo);
+                console.log(`   👤 Usuario creador: ${prestamo.usuario_creador || 'N/A'}`);
+                
+                // Verificar que todos los campos necesarios existan
+                const id = prestamo.id_prestamo || prestamo.id || 'N/A';
+                const cliente = prestamo.cliente || prestamo.cliente_nombre || 'N/A';
+                const monto = prestamo.monto_original || prestamo.monto || 0;
+                const tasa = prestamo.tasa_interes || 0;
+                const plazo = prestamo.plazo_dias || 0;
+                const usuarioCreador = prestamo.usuario_creador || 'N/A';
+                
                 html += `
                     <tr>
-                        <td><span class="badge bg-secondary">#${prestamo.id_prestamo}</span></td>
-                        <td>${prestamo.cliente}</td>
-                        <td><span class="fw-bold text-success">$${prestamo.monto_original.toFixed(2)}</span></td>
-                        <td>${prestamo.tasa_interes}%</td>
-                        <td>${prestamo.plazo_dias} días</td>
+                        <td><span class="badge bg-secondary">#${id}</span></td>
+                        <td>${cliente}</td>
+                        <td><span class="fw-bold text-success">$${parseFloat(monto).toFixed(2)}</span></td>
+                        <td>${tasa}%</td>
+                        <td>${plazo} días</td>
+                        <td><span class="badge bg-info">${usuarioCreador}</span></td>
                     </tr>
                 `;
             });
             
             html += '</tbody></table></div>';
             container.innerHTML = html;
+            console.log('✅ Tabla de préstamos actualizada correctamente');
         })
         .catch(error => {
-            console.error('Error al cargar préstamos:', error);
+            console.error('❌ Error al cargar préstamos:', error);
+            const container = document.getElementById('prestamosActivos');
+            container.innerHTML = `
+                <div class="alert alert-danger text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h6>Error de conexión</h6>
+                    <p class="mb-0">No se pudieron cargar los préstamos: ${error.message}</p>
+                    <button class="btn btn-outline-danger btn-sm mt-2" onclick="cargarPrestamosActivos()">
+                        <i class="fas fa-redo me-1"></i>Reintentar
+                    </button>
+                </div>
+            `;
         });
 }
 

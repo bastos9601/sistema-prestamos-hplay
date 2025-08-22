@@ -53,6 +53,9 @@
                         <th>DNI</th>
                         <th>Teléfono</th>
                         <th>Email</th>
+                        {% if session.get('rol') in ['admin', 'supervisor', 'consultor'] %}
+                        <th>Usuario Creador</th>
+                        {% endif %}
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -66,6 +69,19 @@
                         <td>{{ cliente.dni }}</td>
                         <td>{{ cliente.telefono }}</td>
                         <td>{{ cliente.email or '-' }}</td>
+                        {% if session.get('rol') in ['admin', 'supervisor', 'consultor'] %}
+                        <td>
+                            {% if cliente.usuario_creador %}
+                                <span class="badge bg-info" title="Creado por: {{ cliente.usuario_creador.nombre }}">
+                                    <i class="fas fa-user me-1"></i>{{ cliente.usuario_creador.nombre }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary" title="Usuario no disponible">
+                                    <i class="fas fa-question me-1"></i>N/A
+                                </span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
                         <td>
                             <span class="badge bg-{{ 'success' if cliente.activo else 'secondary' }}">
                                 {{ 'Activo' if cliente.activo else 'Inactivo' }}
@@ -77,6 +93,13 @@
                                    class="btn btn-outline-primary" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                {% if cliente.telefono %}
+                                <button type="button" class="btn btn-outline-warning" 
+                                        onclick="abrirWhatsAppCliente({{ cliente.id }}, '{{ cliente.nombre }} {{ cliente.apellido }}', '{{ cliente.telefono }}')" 
+                                        title="Abrir WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                                {% endif %}
                                 <button type="button" class="btn btn-outline-danger" 
                                         onclick="eliminarCliente({{ cliente.id }}, '{{ cliente.nombre }}')" 
                                         title="Eliminar">
@@ -177,6 +200,58 @@ function eliminarCliente(clienteId, nombre) {
     // Mostrar el modal
     const modal = new bootstrap.Modal(document.getElementById('modalEliminarCliente'));
     modal.show();
+}
+
+// Función para abrir WhatsApp del cliente
+function abrirWhatsAppCliente(clienteId, nombreCliente, telefono) {
+    // Mostrar indicador de carga
+    const btn = event.target.closest('button');
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
+    
+    // Realizar petición AJAX
+    fetch(`/api/abrir-whatsapp/${clienteId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensaje de éxito
+            Swal.fire({
+                icon: 'success',
+                title: '¡WhatsApp Abierto!',
+                text: data.message,
+                confirmButtonText: 'OK'
+            });
+        } else {
+            // Mostrar mensaje de error
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al Abrir WhatsApp',
+                text: data.error || 'No se pudo abrir WhatsApp',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de Conexión',
+            text: 'No se pudo conectar con el servidor',
+            confirmButtonText: 'OK'
+        });
+    })
+    .finally(() => {
+        // Restaurar botón
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    });
 }
 
 // Función para actualizar tabla

@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración del Sistema{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 mb-0">
+                <i class="fas fa-cogs text-primary me-2"></i>
+                Configuración del Sistema
+            </h1>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Volver al Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    Configuración General
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="configForm">
+                    <div class="mb-3">
+                        <label for="nombreSistema" class="form-label">
+                            <strong>Nombre del Sistema</strong>
+                        </label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombreSistema" 
+                                   name="nombreSistema"
+                                   value="{{ config.nombre_sistema }}"
+                                   maxlength="100"
+                                   placeholder="Ingrese el nuevo nombre del sistema">
+                            <button type="button" 
+                                    class="btn btn-success" 
+                                    onclick="cambiarNombreSistema()">
+                                <i class="fas fa-save me-1"></i>Guardar Cambios
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            Este nombre aparecerá en la barra de navegación y en el título del sistema.
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="mensajeConfig" class="alert" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información del Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Versión:</strong> {{ config.version }}</p>
+                        <p><strong>Descripción:</strong> {{ config.descripcion }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Empresa:</strong> {{ config.empresa }}</p>
+                        <p><strong>Contacto:</strong> {{ config.contacto }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Fecha de Creación:</strong> {{ config.fecha_creacion }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Última Actualización:</strong> {{ config.ultima_actualizacion }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Importante
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-shield-alt me-2"></i>Acceso Restringido</h6>
+                    <p class="small mb-0">Solo los administradores pueden modificar la configuración del sistema.</p>
+                </div>
+                
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-sync-alt me-2"></i>Cambios Inmediatos</h6>
+                    <p class="small mb-0">Los cambios se aplican inmediatamente y se reflejan en toda la interfaz.</p>
+                </div>
+                
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-database me-2"></i>Persistencia</h6>
+                    <p class="small mb-0">La configuración se guarda automáticamente y persiste entre reinicios.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tools me-2"></i>
+                    Acciones Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('usuarios') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-users me-2"></i>Gestionar Usuarios
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-success">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <button type="button" class="btn btn-outline-warning" onclick="recargarConfiguracion()">
+                        <i class="fas fa-sync-alt me-2"></i>Recargar Configuración
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function cambiarNombreSistema() {
+    const nuevoNombre = document.getElementById('nombreSistema').value.trim();
+    const mensajeDiv = document.getElementById('mensajeConfig');
+    
+    if (!nuevoNombre) {
+        mostrarMensaje('El nombre del sistema no puede estar vacío', 'danger');
+        return;
+    }
+    
+    if (nuevoNombre.length > 100) {
+        mostrarMensaje('El nombre del sistema es demasiado largo (máximo 100 caracteres)', 'danger');
+        return;
+    }
+    
+    // Mostrar indicador de carga
+    const btn = event.target;
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Guardando...';
+    btn.disabled = true;
+    
+    // Enviar petición al servidor
+    fetch('/api/configuracion/cambiar-nombre', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            nuevo_nombre: nuevoNombre
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarMensaje(data.message, 'success');
+            // Actualizar el título de la página
+            document.title = `Configuración - ${data.nuevo_nombre}`;
+            // Mostrar notificación de éxito con SweetAlert2 si está disponible
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: data.message,
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        } else {
+            mostrarMensaje(data.error, 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error en la petición:', error);
+        mostrarMensaje('Error de conexión: ' + error.message, 'danger');
+    })
+    .finally(() => {
+        // Restaurar botón
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    });
+}
+
+function mostrarMensaje(mensaje, tipo) {
+    const mensajeDiv = document.getElementById('mensajeConfig');
+    mensajeDiv.className = `alert alert-${tipo}`;
+    mensajeDiv.textContent = mensaje;
+    mensajeDiv.style.display = 'block';
+    
+    // Ocultar mensaje después de 5 segundos
+    setTimeout(() => {
+        mensajeDiv.style.display = 'none';
+    }, 5000);
+}
+
+function recargarConfiguracion() {
+    location.reload();
+}
+
+// Validación en tiempo real
+document.getElementById('nombreSistema').addEventListener('input', function() {
+    const valor = this.value;
+    const maxLength = 100;
+    const caracteresRestantes = maxLength - valor.length;
+    
+    if (caracteresRestantes < 0) {
+        this.value = valor.substring(0, maxLength);
+    }
+    
+    // Mostrar contador de caracteres
+    let contador = this.parentNode.querySelector('.form-text');
+    if (!contador) {
+        contador = document.createElement('div');
+        contador.className = 'form-text';
+        this.parentNode.appendChild(contador);
+    }
+    
+    if (caracteresRestantes <= 20) {
+        contador.className = 'form-text text-warning';
+    } else {
+        contador.className = 'form-text';
+    }
+    
+    contador.textContent = `${caracteresRestantes} caracteres restantes`;
+});
+</script>
+{% endblock %}

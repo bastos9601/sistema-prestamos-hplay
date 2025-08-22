@@ -78,6 +78,13 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     {% endif %}
+                                    
+                                    {% if session.get('rol') in ['admin', 'supervisor', 'consultor'] and usuario.id != session.get('user_id') and usuario.rol != 'admin' %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="confirmarEliminacionCompleta({{ usuario.id }}, '{{ usuario.nombre }}')" title="Eliminar Completamente">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -121,12 +128,61 @@
     </div>
 </div>
 
+<!-- Modal de Confirmación para Eliminación Completa -->
+<div class="modal fade" id="modalEliminacionCompleta" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación Completa
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar <strong>COMPLETAMENTE</strong> al usuario <strong id="nombreUsuarioCompleto"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>¡ADVERTENCIA!</strong> Esta acción eliminará:
+                    <ul class="mb-0 mt-2">
+                        <li>El usuario de la base de datos</li>
+                        <li>Todos sus clientes asociados</li>
+                        <li>Todos sus préstamos asociados</li>
+                        <li>Todos sus pagos asociados</li>
+                    </ul>
+                </div>
+                <p class="text-danger">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Esta acción no se puede deshacer.</strong>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminacionCompleta" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i>Eliminar Completamente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function confirmarEliminacion(usuarioId, nombreUsuario) {
     document.getElementById('nombreUsuario').textContent = nombreUsuario;
     document.getElementById('formEliminar').action = `/usuarios/${usuarioId}/eliminar`;
     
     const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+    modal.show();
+}
+
+function confirmarEliminacionCompleta(usuarioId, nombreUsuario) {
+    document.getElementById('nombreUsuarioCompleto').textContent = nombreUsuario;
+    document.getElementById('formEliminacionCompleta').action = `/usuarios/${usuarioId}/eliminar-completo`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminacionCompleta'));
     modal.show();
 }
 </script>

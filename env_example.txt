@@ -1,0 +1,32 @@
+# Configuración de WhatsApp Business API
+# ================================================
+
+# URL de la API de Facebook (no cambiar)
+WHATSAPP_API_URL=https://graph.facebook.com/v17.0
+
+# ID del número de teléfono de WhatsApp Business
+# Obtener desde: https://developers.facebook.com/apps/
+WHATSAPP_PHONE_NUMBER_ID=123456789012345
+
+# Token de acceso permanente
+# Obtener desde: https://developers.facebook.com/apps/
+WHATSAPP_ACCESS_TOKEN=tu_access_token_aqui
+
+# Token de verificación del webhook
+# Puede ser cualquier string que elijas
+WHATSAPP_VERIFY_TOKEN=mi_token_secreto_123
+
+# URL del webhook (opcional, para recibir mensajes)
+# Debe ser HTTPS y accesible públicamente
+WHATSAPP_WEBHOOK_URL=https://tudominio.com/webhook/whatsapp
+
+# ================================================
+# INSTRUCCIONES DE CONFIGURACIÓN:
+# ================================================
+# 1. Ve a https://developers.facebook.com/
+# 2. Crea una nueva aplicación o usa una existente
+# 3. Agrega el producto "WhatsApp Business API"
+# 4. Configura el número de teléfono de WhatsApp Business
+# 5. Obtén el Phone Number ID y Access Token
+# 6. Copia estos valores en las variables de arriba
+# 7. Reinicia la aplicación

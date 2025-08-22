@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 class LoginForm(FlaskForm):
     """Formulario de login"""
@@ -28,3 +28,28 @@ class CambiarPasswordForm(FlaskForm):
         DataRequired(message='Debe confirmar la nueva contraseña')
     ])
     submit = SubmitField('Cambiar Contraseña')
+
+class OlvidePasswordForm(FlaskForm):
+    """Formulario para recuperar contraseña"""
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Enviar Código')
+
+class VerificarCodigoForm(FlaskForm):
+    """Formulario para verificar código de recuperación"""
+    codigo = StringField('Código', validators=[
+        DataRequired(),
+        Length(min=6, max=6, message='El código debe tener exactamente 6 dígitos')
+    ])
+    submit = SubmitField('Verificar Código')
+
+class RestablecerPasswordForm(FlaskForm):
+    """Formulario para restablecer contraseña"""
+    password = PasswordField('Nueva Contraseña', validators=[
+        DataRequired(),
+        Length(min=6, message='La contraseña debe tener al menos 6 caracteres')
+    ])
+    confirm_password = PasswordField('Confirmar Contraseña', validators=[
+        DataRequired(),
+        EqualTo('password', message='Las contraseñas no coinciden')
+    ])
+    submit = SubmitField('Restablecer Contraseña')

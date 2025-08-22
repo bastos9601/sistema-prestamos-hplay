@@ -31,6 +31,9 @@
                                 <th>ID</th>
                                 <th>Préstamo</th>
                                 <th>Cliente</th>
+                                {% if session.get('rol') in ['admin', 'supervisor', 'consultor'] %}
+                                <th>Usuario Creador</th>
+                                {% endif %}
                                 <th>Monto</th>
                                 <th>Fecha</th>
                                 <th>Concepto</th>
@@ -51,6 +54,19 @@
                                     <strong>{{ pago.cliente.nombre }} {{ pago.cliente.apellido }}</strong>
                                     <br><small class="text-muted">{{ pago.cliente.dni }}</small>
                                 </td>
+                                {% if session.get('rol') in ['admin', 'supervisor', 'consultor'] %}
+                                <td>
+                                    {% if pago.usuario_creador %}
+                                        <span class="badge bg-info" title="Creado por: {{ pago.usuario_creador.nombre }}">
+                                            <i class="fas fa-user me-1"></i>{{ pago.usuario_creador.nombre }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary" title="Usuario no disponible">
+                                            <i class="fas fa-question me-1"></i>N/A
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
                                 <td>
                                     <span class="fw-bold text-success">
                                         ${{ "%.2f"|format(pago.pago.monto) }}
@@ -102,6 +118,22 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
+                                        {% if pago.cliente.telefono %}
+                                        <a href="https://wa.me/51{{ pago.cliente.telefono }}?text=💳%20COMPROBANTE%20DE%20PAGO%0A%0A👤%20Cliente:%20{{ pago.cliente.nombre }}%20{{ pago.cliente.apellido }}%0A💰%20Monto%20Pagado:%20${{ "%.2f"|format(pago.pago.monto) }}%0A⚖️%20Saldo%20Pendiente:%20${{ "%.2f"|format(pago.pago.saldo_despues) }}%0A📅%20Fecha:%20{{ pago.pago.fecha.strftime('%d/%m/%Y') if pago.pago.fecha else 'N/A' }}%0A%0A✅%20Pago%20Registrado%20Exitosamente" 
+                                           target="_blank"
+                                           class="btn btn-outline-success" 
+                                           title="Enviar Comprobante por WhatsApp">
+                                            <i class="fas fa-receipt"></i>
+                                            <small>Comprobante</small>
+                                        </a>
+                                        <a href="https://wa.me/51{{ pago.cliente.telefono }}" 
+                                           target="_blank"
+                                           class="btn btn-outline-info" 
+                                           title="Abrir Chat de WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
+                                            <small>Chat</small>
+                                        </a>
+                                        {% endif %}
                                         <button type="button" 
                                                 class="btn btn-outline-danger" 
                                                 title="Eliminar Pago"
@@ -179,6 +211,9 @@
 function refreshTable() {
     location.reload();
 }
+
+// Los botones de WhatsApp ahora abren directamente WhatsApp Web
+// No se necesita JavaScript adicional
 
 // Función para confirmar eliminación de pago
 function confirmarEliminacionPago(pagoId, nombreCliente, monto) {

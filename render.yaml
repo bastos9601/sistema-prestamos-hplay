@@ -1,26 +1,41 @@
 services:
+  # Base de datos PostgreSQL
+  - type: postgresql
+    name: prestamos-db
+    plan: free
+    ipAllowList: []
+    
+  # Aplicación web Flask
   - type: web
-    name: sistema-prestamos
+    name: prestamos-web
     env: python
     plan: free
-    buildCommand: pip install -r requirements-lock.txt
-    startCommand: gunicorn wsgi:app
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.7
-      - key: SECRET_KEY
-        generateValue: true
+        value: 3.9.16
       - key: FLASK_ENV
         value: production
+      - key: SECRET_KEY
+        generateValue: true
       - key: DATABASE_URL
         fromDatabase:
           name: prestamos-db
           property: connectionString
-    healthCheckPath: /
-    autoDeploy: true
-
-databases:
-  - name: prestamos-db
-    databaseName: prestamos
-    user: prestamos_user
-    plan: free
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USE_TLS
+        value: true
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: WHATSAPP_API_KEY
+        sync: false
+      - key: WHATSAPP_PHONE_ID
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO

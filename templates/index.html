@@ -27,7 +27,7 @@
 
 <!-- Estadísticas Rápidas -->
 <div class="row mb-4">
-    <div class="col-md-3 mb-3">
+    <div class="col-md-2 mb-3">
         <div class="card bg-primary text-white h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
@@ -43,7 +43,7 @@
         </div>
     </div>
     
-    <div class="col-md-3 mb-3">
+    <div class="col-md-2 mb-3">
         <div class="card bg-success text-white h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
@@ -59,7 +59,7 @@
         </div>
     </div>
     
-    <div class="col-md-3 mb-3">
+    <div class="col-md-2 mb-3">
         <div class="card bg-info text-white h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
@@ -75,7 +75,7 @@
         </div>
     </div>
     
-    <div class="col-md-3 mb-3">
+    <div class="col-md-2 mb-3">
         <div class="card bg-warning text-white h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
@@ -85,6 +85,38 @@
                     </div>
                     <div class="align-self-center">
                         <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-2 mb-3">
+        <div class="card bg-secondary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Total Usuarios</h6>
+                        <h2 class="mb-0">{{ stats.get('total_usuarios', 0) }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-shield fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-2 mb-3">
+        <div class="card bg-dark text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Total Pagos</h6>
+                        <h2 class="mb-0">{{ stats.get('total_pagos', 0) }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-credit-card fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>

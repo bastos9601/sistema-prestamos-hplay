@@ -6,7 +6,55 @@
     "dni": "769857",
     "telefono": "96326489",
     "email": "prometieron66@gmail.com",
+    "usuario_id": 1,
     "fecha_registro": "2025-08-18T02:33:44.558564",
+    "activo": false
+  },
+  {
+    "id": 2,
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "dni": "12345678",
+    "telefono": "123-456-789",
+    "email": "juan@test.com",
+    "usuario_id": 2,
+    "fecha_registro": "2025-08-22T08:30:29.998136",
+    "activo": false
+  },
+  {
+    "id": 3,
+    "nombre": "alfredo",
+    "apellido": "bastos",
+    "dni": "96532487",
+    "telefono": "96325874",
+    "email": "bastosbarbaranvictor@gmail.com",
+    "usuario_id": 1,
+    "usuario_creador_id": 1,
+    "fecha_registro": "2025-08-22T14:38:56.550530",
+    "activo": true
+  },
+  {
+    "id": 4,
+    "nombre": "hugo",
+    "apellido": "bastos",
+    "dni": "96318",
+    "telefono": "936185288",
+    "email": "bastoshugo01@gmail.com",
+    "usuario_id": 11,
+    "usuario_creador_id": 11,
+    "fecha_registro": "2025-08-22T14:52:51.387589",
+    "activo": true
+  },
+  {
+    "id": 5,
+    "nombre": "jenneey",
+    "apellido": "bastos",
+    "dni": "932548",
+    "telefono": "963265487",
+    "email": "snas1864@gmail.com",
+    "usuario_id": 12,
+    "usuario_creador_id": 12,
+    "fecha_registro": "2025-08-22T15:27:05.017058",
     "activo": true
   }
 ]

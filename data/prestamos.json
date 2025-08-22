@@ -1,51 +1,71 @@
 [
   {
     "id": 1,
-    "cliente_id": 1,
+    "cliente_id": 3,
     "monto": 100.0,
     "tasa_interes": 305.0,
     "plazo_dias": 24,
     "tipo_interes": "simple",
-    "fecha_inicio": "2025-08-18",
-    "fecha_creacion": "2025-08-18T02:35:48.884082",
+    "fecha_inicio": "2025-08-22",
+    "fecha_creacion": "2025-08-22T14:39:11.190401",
     "estado": "activo",
+    "descripcion": "",
+    "usuario_id": 1,
+    "usuario_creador_id": 1,
     "pagos": [
       {
         "id": 1,
         "prestamo_id": 1,
         "monto": 5.0,
-        "fecha": "2025-08-18T00:00:00",
-        "concepto": "primer pago",
-        "fecha_registro": "2025-08-18T02:36:18.384793",
-        "saldo_despues": 120.05479452054794
-      },
-      {
-        "id": 2,
-        "prestamo_id": 1,
-        "monto": 5.0,
-        "fecha": "2025-08-18T00:00:00",
+        "fecha": "2025-08-22T14:39:26.159249",
         "concepto": "Pago de cuota",
-        "fecha_registro": "2025-08-18T03:00:28.050762",
-        "saldo_despues": 115.05479452054794
-      },
-      {
-        "id": 3,
-        "prestamo_id": 1,
-        "monto": 5.0,
-        "fecha": "2025-08-18T00:00:00",
-        "concepto": "Pago de cuota",
-        "fecha_registro": "2025-08-18T03:13:10.802606",
-        "saldo_despues": 110.05479452054794
-      },
-      {
-        "id": 0,
-        "prestamo_id": 1,
-        "monto": 5.0,
-        "fecha": "2025-08-18T03:32:16.089275",
-        "concepto": "Pago de cuota",
-        "fecha_registro": "2025-08-18T03:32:16.089275",
-        "saldo_despues": 105.05479452054794
+        "fecha_registro": "2025-08-22T14:39:26.159249",
+        "saldo_despues": 115.05479452054794,
+        "usuario_id": 1,
+        "usuario_creador_id": 1
       }
     ]
+  },
+  {
+    "id": 2,
+    "cliente_id": 4,
+    "monto": 100.0,
+    "tasa_interes": 305.0,
+    "plazo_dias": 24,
+    "tipo_interes": "simple",
+    "fecha_inicio": "2025-08-22",
+    "fecha_creacion": "2025-08-22T14:53:18.176252",
+    "estado": "activo",
+    "descripcion": "",
+    "usuario_id": 11,
+    "usuario_creador_id": 11,
+    "pagos": [
+      {
+        "id": 2,
+        "prestamo_id": 2,
+        "monto": 5.0,
+        "fecha": "2025-08-22T15:18:30.532284",
+        "concepto": "Pago de cuota",
+        "fecha_registro": "2025-08-22T15:18:30.532284",
+        "saldo_despues": 115.05479452054794,
+        "usuario_id": 11,
+        "usuario_creador_id": 11
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "cliente_id": 5,
+    "monto": 200.0,
+    "tasa_interes": 305.0,
+    "plazo_dias": 24,
+    "tipo_interes": "simple",
+    "fecha_inicio": "2025-08-22",
+    "fecha_creacion": "2025-08-22T15:27:24.066597",
+    "estado": "activo",
+    "descripcion": "",
+    "usuario_id": 12,
+    "usuario_creador_id": 12,
+    "pagos": []
   }
 ]

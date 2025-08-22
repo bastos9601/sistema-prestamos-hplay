@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Código - Sistema de Préstamos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .verify-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 450px;
+            width: 100%;
+        }
+        .verify-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .verify-header i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .verify-body {
+            padding: 2rem;
+        }
+        .btn-verify {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn-back {
+            background: #6c757d;
+            border: none;
+            border-radius: 25px;
+            padding: 12px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .btn-back:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+        .code-input {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 0.5rem;
+        }
+        .resend-section {
+            text-align: center;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="verify-container">
+                    <div class="verify-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4 class="mb-0">Verificar Código</h4>
+                        <p class="mb-0">Ingresa el código de 6 dígitos</p>
+                    </div>
+                    
+                    <div class="verify-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="form-floating">
+                                {{ form.codigo(class="form-control code-input", placeholder="000000", maxlength="6", pattern="[0-9]{6}") }}
+                                <label for="{{ form.codigo.id }}">
+                                    <i class="fas fa-key me-2"></i>Código de verificación
+                                </label>
+                                {% if form.codigo.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.codigo.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            {{ form.submit(class="btn btn-primary btn-verify") }}
+                        </form>
+                        
+                        <div class="resend-section">
+                            <small class="text-muted mb-2 d-block">
+                                <i class="fas fa-clock me-1"></i>
+                                El código expira en 10 minutos
+                            </small>
+                            <a href="{{ url_for('olvide_password') }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-redo me-1"></i>Reenviar código
+                            </a>
+                        </div>
+                        
+                        <a href="{{ url_for('login') }}" class="btn btn-secondary btn-back">
+                            <i class="fas fa-arrow-left me-2"></i>Volver al Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-focus en el campo de código
+        document.addEventListener('DOMContentLoaded', function() {
+            const codigoInput = document.querySelector('.code-input');
+            if (codigoInput) {
+                codigoInput.focus();
+            }
+        });
+        
+        // Solo permitir números
+        document.querySelector('.code-input').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    </script>
+</body>
+</html>

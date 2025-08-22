@@ -1,18 +1,6 @@
-# Dependencias principales para la aplicación web
-Flask==2.2.5
-Werkzeug==2.2.3
+Flask==2.3.3
 Flask-WTF==1.1.1
-WTForms==3.0.1
-email-validator==2.2.0
-
-# Servidor WSGI para producción
-gunicorn==20.1.0
-
-# Utilidades
-python-dateutil==2.8.2
-
-# Dependencias para desarrollo local (opcionales)
-# tabulate==0.9.0
-# colorama==0.4.6
-# pillow==10.0.0
-# ttkthemes==3.2.2
+Werkzeug==2.3.7
+psycopg2-binary==2.9.7
+python-dotenv==1.0.0
+gunicorn==21.2.0

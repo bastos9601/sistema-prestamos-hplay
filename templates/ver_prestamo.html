@@ -14,6 +14,12 @@
                 <a href="{{ url_for('nuevo_pago') }}?prestamo_id={{ resumen.prestamo.id }}" class="btn btn-success me-2">
                     <i class="fas fa-credit-card me-1"></i>Registrar Pago
                 </a>
+                <a href="{{ url_for('descargar_pagare_pdf', prestamo_id=resumen.prestamo.id) }}" class="btn btn-info me-2" target="_blank">
+                    <i class="fas fa-file-pdf me-1"></i>Descargar PDF
+                </a>
+                <a href="{{ url_for('ver_pagare', prestamo_id=resumen.prestamo.id) }}" class="btn btn-warning me-2" target="_blank">
+                    <i class="fas fa-file-signature me-1"></i>Pagaré Interactivo
+                </a>
                 <a href="{{ url_for('prestamos') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left me-1"></i>Volver
                 </a>
@@ -38,19 +44,19 @@
                             </tr>
                             <tr>
                                 <td><strong>Cliente:</strong></td>
-                                <td>{{ resumen.prestamo.cliente.nombre }} {{ resumen.prestamo.cliente.apellido }}</td>
+                                <td>{{ resumen.cliente.nombre }} {{ resumen.cliente.apellido }}</td>
                             </tr>
                             <tr>
                                 <td><strong>DNI:</strong></td>
-                                <td>{{ resumen.prestamo.cliente.dni }}</td>
+                                <td>{{ resumen.cliente.dni }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Teléfono:</strong></td>
-                                <td>{{ resumen.prestamo.cliente.telefono }}</td>
+                                <td>{{ resumen.cliente.telefono }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Email:</strong></td>
-                                <td>{{ resumen.prestamo.cliente.email or 'No especificado' }}</td>
+                                <td>{{ resumen.cliente.email or 'No especificado' }}</td>
                             </tr>
                         </table>
                     </div>
@@ -120,7 +126,7 @@
                     <div class="col-md-3 mb-3">
                         <div class="border rounded p-3">
                             <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
-                            <h4 class="text-success">${{ "%.2f"|format(resumen.monto_original) }}</h4>
+                            <h4 class="text-success">${{ "%.2f"|format(resumen.resumen.monto_original) }}</h4>
                             <p class="text-muted mb-0">Monto Original</p>
                         </div>
                     </div>
@@ -140,14 +146,14 @@
                     <div class="col-md-3 mb-3">
                         <div class="border rounded p-3">
                             <i class="fas fa-percentage fa-2x text-warning mb-2"></i>
-                            <h4 class="text-warning">${{ "%.2f"|format(resumen.total_intereses) }}</h4>
+                            <h4 class="text-warning">${{ "%.2f"|format(resumen.resumen.interes_total) }}</h4>
                             <p class="text-muted mb-0">Total Intereses</p>
                         </div>
                     </div>
                     <div class="col-md-3 mb-3">
                         <div class="border rounded p-3">
                             <i class="fas fa-balance-scale fa-2x text-danger mb-2"></i>
-                            <h4 class="text-danger">${{ "%.2f"|format(resumen.saldo_pendiente) }}</h4>
+                            <h4 class="text-danger">${{ "%.2f"|format(resumen.resumen.saldo_pendiente) }}</h4>
                             <p class="text-muted mb-0">Saldo Pendiente</p>
                         </div>
                     </div>

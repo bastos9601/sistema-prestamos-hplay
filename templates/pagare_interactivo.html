@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagaré Interactivo - Préstamo #{{ prestamo.id }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .pagare-container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .pagare-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .pagare-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .pagare-header h2 {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .pagare-content {
+            padding: 40px;
+        }
+        
+        .info-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        
+        .info-section h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: #27ae60;
+        }
+        
+        .conditions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .conditions h4 {
+            color: #856404;
+            margin-top: 0;
+        }
+        
+        .conditions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .conditions li {
+            margin-bottom: 8px;
+            color: #856404;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .signature-canvas {
+            border: 2px dashed #bdc3c7;
+            border-radius: 10px;
+            background: white;
+            cursor: crosshair;
+            margin: 20px auto;
+            display: block;
+            max-width: 100%;
+        }
+        
+        .signature-controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        
+        .client-info {
+            background: #e8f5e8;
+            border: 1px solid #a8e6cf;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .client-name {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        
+        .client-details {
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        .print-section {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Responsive para móviles */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            .pagare-container {
+                border-radius: 10px;
+                margin: 5px;
+            }
+            
+            .pagare-header {
+                padding: 20px 15px;
+            }
+            
+            .pagare-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .pagare-header h2 {
+                font-size: 1rem;
+            }
+            
+            .pagare-content {
+                padding: 20px 15px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .signature-canvas {
+                width: 100%;
+                height: 150px;
+            }
+            
+            .signature-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .signature-controls button {
+                width: 100%;
+                margin: 0;
+            }
+            
+            .print-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .print-section button {
+                width: 100%;
+                margin: 0;
+            }
+            
+            .client-info {
+                padding: 15px;
+            }
+            
+            .client-name {
+                font-size: 1.3rem;
+            }
+            
+            .info-section {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .signature-section {
+                padding: 20px 15px;
+                margin-top: 20px;
+            }
+        }
+        
+        @media print {
+            body { background: white; }
+            .pagare-container { box-shadow: none; }
+            .signature-controls, .print-section { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="pagare-container">
+        <!-- Encabezado del Pagaré -->
+        <div class="pagare-header">
+            <h1>📄 PAGARÉ GENERADO</h1>
+            <h2>PAGARÉ DE PRÉSTAMO PERSONAL</h2>
+        </div>
+        
+        <div class="pagare-content">
+            <!-- Información del Préstamo -->
+            <div class="info-section">
+                <h3>📋 INFORMACIÓN DEL PRÉSTAMO</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Número de Préstamo:</span>
+                        <span class="info-value">#{{ prestamo.id }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fecha de Emisión:</span>
+                        <span class="info-value">{{ prestamo.fecha_inicio.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fecha de Vencimiento:</span>
+                        <span class="info-value">{{ (prestamo.fecha_inicio + timedelta(days=prestamo.plazo_dias)).strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Monto Solicitado:</span>
+                        <span class="info-value">${{ "%.2f"|format(prestamo.monto) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Plazo:</span>
+                        <span class="info-value">{{ prestamo.plazo_dias }} días</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Tasa de Interés:</span>
+                        <span class="info-value">{{ "%.1f"|format(prestamo.tasa_interes) }}% anual</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Tipo de Interés:</span>
+                        <span class="info-value">{{ prestamo.tipo_interes.title() }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cuota Diaria:</span>
+                        <span class="info-value">${{ "%.2f"|format(prestamo.calcular_cuota_diaria()) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total de Intereses:</span>
+                        <span class="info-value">${{ "%.2f"|format(prestamo.calcular_interes_total()) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total a Pagar:</span>
+                        <span class="info-value">${{ "%.2f"|format(prestamo.calcular_monto_total()) }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información del Cliente -->
+            <div class="info-section">
+                <h3>👤 DATOS DEL CLIENTE</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Nombre Completo:</span>
+                        <span class="info-value">{{ cliente.nombre }} {{ cliente.apellido }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">DNI:</span>
+                        <span class="info-value">{{ cliente.dni }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Teléfono:</span>
+                        <span class="info-value">{{ cliente.telefono }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ cliente.email or 'No especificado' }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Condiciones del Préstamo -->
+            <div class="conditions">
+                <h4>📝 CONDICIONES DEL PRÉSTAMO</h4>
+                <ul>
+                    <li>El cliente se compromete a pagar una cuota diaria de <strong>${{ "%.2f"|format(prestamo.calcular_cuota_diaria()) }}</strong></li>
+                    <li>El préstamo será pagado en <strong>{{ prestamo.plazo_dias }} días</strong></li>
+                    <li>En caso de mora, se aplicarán intereses adicionales según la tasa establecida</li>
+                    <li>El préstamo debe ser cancelado en su totalidad al vencimiento</li>
+                    <li>Cualquier consulta contactar al prestamista</li>
+                </ul>
+            </div>
+            
+            <!-- Sección de Firma Digital -->
+            <div class="signature-section">
+                <h3>✍️ FIRMA DIGITAL DEL CLIENTE</h3>
+                <p>Firma en el recuadro de abajo para confirmar tu compromiso de pago:</p>
+                
+                <canvas id="signatureCanvas" class="signature-canvas" width="600" height="200"></canvas>
+                
+                <div class="signature-controls">
+                    <button class="btn btn-primary" onclick="clearSignature()">
+                        🗑️ Limpiar Firma
+                    </button>
+                    <button class="btn btn-success" onclick="saveSignature()">
+                        💾 Guardar Firma
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadPagare()">
+                        📥 Descargar Pagaré
+                    </button>
+                </div>
+                
+                <div id="signatureStatus" style="margin-top: 20px; font-weight: 600;"></div>
+            </div>
+            
+            <!-- Información del Cliente para Firma -->
+            <div class="client-info">
+                <div class="client-name">{{ cliente.nombre }} {{ cliente.apellido }}</div>
+                <div class="client-details">
+                    DNI: {{ cliente.dni }} | Teléfono: {{ cliente.telefono }}
+                </div>
+                <div style="margin-top: 15px; font-size: 0.9em; color: #7f8c8d;">
+                    Prestamista: Sistema de Préstamos
+                </div>
+            </div>
+            
+            <!-- Sección de Impresión y Envío -->
+            <div class="print-section">
+                <button class="btn btn-primary" onclick="window.print()">
+                    🖨️ Imprimir Pagaré
+                </button>
+                <button class="btn btn-success" onclick="enviarWhatsApp()">
+                    📱 Enviar Resumen por WhatsApp
+                </button>
+
+                <button class="btn btn-secondary" onclick="enviarPagareEmail()">
+                    📧 Enviar Pagaré en PDF por Email
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Variables para el canvas de firma
+        const canvas = document.getElementById('signatureCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let hasSignature = false;
+        
+        // Configurar el canvas
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        
+        // Eventos del mouse
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        // Eventos táctiles para dispositivos móviles
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouch);
+        canvas.addEventListener('touchend', stopDrawing);
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            draw(e);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            
+            hasSignature = true;
+        }
+        
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                           e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+        
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSignature = false;
+            updateStatus('Firma limpiada', 'warning');
+        }
+        
+        function saveSignature() {
+            if (!hasSignature) {
+                updateStatus('⚠️ Debes firmar antes de guardar', 'error');
+                return;
+            }
+            
+            // Convertir canvas a imagen
+            const signatureImage = canvas.toDataURL('image/png');
+            
+            // Guardar en localStorage
+            localStorage.setItem('pagare_signature_' + {{ prestamo.id }}, signatureImage);
+            
+            // Guardar en el servidor
+            fetch('/api/guardar-firma/{{ prestamo.id }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    firma: signatureImage
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateStatus('✅ Firma guardada exitosamente en el servidor', 'success');
+                } else {
+                    updateStatus('⚠️ Error al guardar en servidor: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                updateStatus('⚠️ Error de conexión: ' + error.message, 'error');
+            });
+        }
+        
+        function downloadPagare() {
+            if (!hasSignature) {
+                updateStatus('⚠️ Debes firmar antes de descargar', 'error');
+                return;
+            }
+            
+            // Crear un nuevo documento con la firma
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Pagaré Firmado - Préstamo #{{ prestamo.id }}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .signature { border: 1px solid #000; padding: 20px; margin: 20px 0; }
+                    </style>
+                </head>
+                <body>
+                    <h1>PAGARÉ FIRMADO</h1>
+                    <p>Préstamo #{{ prestamo.id }} - {{ cliente.nombre }} {{ cliente.apellido }}</p>
+                    <div class="signature">
+                        <h3>Firma del Cliente:</h3>
+                        <img src="${localStorage.getItem('pagare_signature_' + {{ prestamo.id }})}" style="max-width: 300px;">
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+        
+        function updateStatus(message, type) {
+            const statusDiv = document.getElementById('signatureStatus');
+            statusDiv.textContent = message;
+            statusDiv.style.color = type === 'success' ? '#27ae60' : 
+                                  type === 'warning' ? '#f39c12' : '#e74c3c';
+        }
+        
+        function enviarWhatsApp() {
+            const telefono = '{{ cliente.telefono }}';
+            const mensaje = `📄 *PAGARÉ GENERADO*%0A%0A` +
+                           `👤 Cliente: {{ cliente.nombre }} {{ cliente.apellido }}%0A` +
+                           `💰 Monto: ${{ "%.2f"|format(prestamo.monto) }}%0A` +
+                           `📅 Plazo: {{ prestamo.plazo_dias }} días%0A` +
+                           `💳 Cuota Diaria: ${{ "%.2f"|format(prestamo.calcular_cuota_diaria()) }}%0A` +
+                           `📊 Total a Pagar: ${{ "%.2f"|format(prestamo.calcular_monto_total()) }}%0A%0A` +
+                           `✅ Pagaré generado exitosamente`;
+            
+            const url = `https://wa.me/51${telefono}?text=${mensaje}`;
+            window.open(url, '_blank');
+        }
+        
+
+        
+
+        
+        function enviarPagareEmail() {
+            // Mostrar indicador de carga
+            const btn = event.target;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando email...';
+            btn.disabled = true;
+            
+            // Enviar petición al servidor para enviar por email
+            fetch('/api/enviar-pagare-email/{{ prestamo.id }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateStatus('✅ Pagaré en PDF enviado por email a ' + data.email, 'success');
+                } else {
+                    updateStatus('❌ Error: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                updateStatus('❌ Error de conexión: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Restaurar botón
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            });
+        }
+        
+        // Inicialización
+        updateStatus('✍️ Firma en el recuadro de arriba', 'info');
+    </script>
+</body>
+</html>
