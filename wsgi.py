@@ -4,7 +4,7 @@ Archivo WSGI para el despliegue en Render
 """
 
 import os
-from app_basic import app
+from app_minimal import app
 
 if __name__ == "__main__":
     # Configuración para producción
