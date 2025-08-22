@@ -9,8 +9,8 @@ FLASK_ENV=production
 MAIL_SERVER=smtp.gmail.com
 MAIL_PORT=587
 MAIL_USE_TLS=true
-MAIL_USERNAME=tu-email@gmail.com
-MAIL_PASSWORD=tu-password-de-aplicacion
+MAIL_USERNAME=bastosbarbaranvictor@gmail.com
+MAIL_PASSWORD=ldkhglaolpcofqbs
 
 # Configuración de WhatsApp (opcional)
 WHATSAPP_API_KEY=tu-api-key-de-whatsapp
