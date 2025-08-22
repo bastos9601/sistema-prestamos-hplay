@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-Archivo WSGI para producción
+Archivo WSGI para el despliegue en Render
 """
 
 import os
-import sys
-
-# Agregar el directorio del proyecto al path
-sys.path.insert(0, os.path.dirname(__file__))
-
-# Importar la aplicación Flask
 from app import app
 
 if __name__ == "__main__":
-    app.run()
+    # Configuración para producción
+    port = int(os.environ.get("PORT", 5000))
+    
+    # Configurar para producción
+    app.config['FLASK_ENV'] = 'production'
+    app.config['DEBUG'] = False
+    
+    # Ejecutar la aplicación
+    app.run(host='0.0.0.0', port=port)

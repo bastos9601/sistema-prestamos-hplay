@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "cliente_id": 1,
+    "monto": 200.0,
+    "tasa_interes": 305.0,
+    "plazo_dias": 24,
+    "tipo_interes": "simple",
+    "fecha_inicio": "2025-08-22",
+    "fecha_creacion": "2025-08-22T09:11:37.728925",
+    "estado": "activo",
+    "descripcion": "Préstamo de prueba",
+    "usuario_id": 1,
+    "pagos": []
+  },
+  {
+    "id": 2,
+    "cliente_id": 3,
+    "monto": 100.0,
+    "tasa_interes": 305.0,
+    "plazo_dias": 24,
+    "tipo_interes": "simple",
+    "fecha_inicio": "2025-08-22",
+    "fecha_creacion": "2025-08-22T09:13:14.764221",
+    "estado": "activo",
+    "descripcion": "",
+    "usuario_id": 1,
+    "pagos": []
+  }
+]
