@@ -10,11 +10,11 @@ services:
     name: prestamos-web
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: chmod +x build.sh && ./build.sh
     startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.16
+        value: 3.8.16
       - key: FLASK_ENV
         value: production
       - key: SECRET_KEY
@@ -30,9 +30,9 @@ services:
       - key: MAIL_USE_TLS
         value: true
       - key: MAIL_USERNAME
-        sync: false
+        value: bastosbarbaranvictor@gmail.com
       - key: MAIL_PASSWORD
-        sync: false
+        value: ldkhglaolpcofqbs
       - key: WHATSAPP_API_KEY
         sync: false
       - key: WHATSAPP_PHONE_ID

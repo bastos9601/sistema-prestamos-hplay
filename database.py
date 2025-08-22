@@ -151,10 +151,10 @@ class Database:
                     
                     if usuario_propietario:
                         print(f"👤 Usuario propietario: {usuario_propietario['username']}, Rol: {usuario_propietario['rol']}")
-                        # Solo incluir si el usuario propietario no es admin
+                    # Solo incluir si el usuario propietario no es admin
                         if usuario_propietario.get('rol') != 'admin':
                             print(f"✅ Cliente accesible para supervisor")
-                            return Cliente.from_dict(cliente_data)
+                        return Cliente.from_dict(cliente_data)
                         else:
                             print(f"❌ Cliente pertenece a admin - no accesible")
                     else:
