@@ -1,16 +1,10 @@
 services:
-  # Base de datos PostgreSQL
-  - type: postgresql
-    name: prestamos-db
-    plan: free
-    ipAllowList: []
-    
-  # Aplicación web Flask
+  # Aplicación web Flask (sin base de datos externa por ahora)
   - type: web
     name: prestamos-web
     env: python
     plan: free
-    buildCommand: pip install -r requirements-basic.txt
+    buildCommand: pip install -r requirements-ultra-minimal.txt
     startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
     envVars:
       - key: PYTHON_VERSION
@@ -19,10 +13,6 @@ services:
         value: production
       - key: SECRET_KEY
         generateValue: true
-      - key: DATABASE_URL
-        fromDatabase:
-          name: prestamos-db
-          property: connectionString
       - key: MAIL_SERVER
         value: smtp.gmail.com
       - key: MAIL_PORT
