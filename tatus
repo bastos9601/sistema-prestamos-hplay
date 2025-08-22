@@ -1,0 +1,5 @@
+[33med2233c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix: Versión hello world para Render sin módulos problemáticos
+[33m9fa92cd[m Fix: Versión mínima para Render sin dependencias problemáticas
+[33m11fc4ce[m Fix: Versión básica para Render sin dependencias problemáticas
+[33m70e7bf3[m Fix: Optimizar build para Render con Python 3.8
+[33m3da2848[m Preparar proyecto para Render con PostgreSQL
