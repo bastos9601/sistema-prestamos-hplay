@@ -86,44 +86,30 @@
                         {% endwith %}
                         
                         <form method="POST" action="{{ url_for('login') }}">
-                            {{ form.hidden_tag() }}
-                            
                             <div class="form-floating">
-                                {{ form.username(class="form-control", placeholder="Usuario") }}
-                                <label for="{{ form.username.id }}">
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required>
+                                <label for="username">
                                     <i class="fas fa-user me-2"></i>Usuario
                                 </label>
-                                {% if form.username.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.username.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
                             </div>
                             
                             <div class="form-floating">
-                                {{ form.password(class="form-control", placeholder="Contraseña") }}
-                                <label for="{{ form.password.id }}">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                                <label for="password">
                                     <i class="fas fa-lock me-2"></i>Contraseña
                                 </label>
-                                {% if form.password.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.password.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
                             </div>
                             
                             <div class="form-check mb-3">
-                                {{ form.remember_me(class="form-check-input") }}
-                                <label class="form-check-label" for="{{ form.remember_me.id }}">
+                                <input class="form-check-input" type="checkbox" id="remember_me" name="remember_me">
+                                <label class="form-check-label" for="remember_me">
                                     Recordarme
                                 </label>
                             </div>
                             
-                            {{ form.submit(class="btn btn-primary btn-login") }}
+                            <button type="submit" class="btn btn-primary btn-login">
+                                <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                            </button>
                             
                             <div class="text-center mt-3">
                                 <a href="{{ url_for('olvide_password') }}" class="text-decoration-none">
